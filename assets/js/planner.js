@@ -60,19 +60,24 @@ function addSubRow(button) {
     tbody.appendChild(newRow);
 }
 
+
+
 function removeSubRow(button) {
     const row = button.closest('tr');
     const tbody = row.closest('tbody');
     const allRows = Array.from(tbody.querySelectorAll('tr'));
 
     if (allRows.length === 1) {
+        // Only 1 developer, remove whole project group
         tbody.remove();
         return;
     }
 
     if (row === allRows[0]) {
+        // If it's the first developer row (main row), promote the second one properly
         const secondRow = allRows[1];
 
+        // Copy actual values from inputs/selects
         const taskInput = secondRow.querySelector('input[name="task_description[]"]');
         const hoursSelect = secondRow.querySelector('select[name="hours[]"]');
         const assignedSelect = secondRow.querySelector('select[name="assigned_to[][]"]');
@@ -89,9 +94,11 @@ function removeSubRow(button) {
 
         secondRow.remove();
     } else {
+        // Any other row — just remove it
         row.remove();
     }
 
+    // Update rowspan
     const updatedRows = Array.from(tbody.querySelectorAll('tr'));
     const projectCell = tbody.querySelector('.project-cell');
     if (projectCell) {
@@ -99,8 +106,104 @@ function removeSubRow(button) {
     }
 }
 
+
+
 function removeRow(button) {
     const row = button.closest("tr");
     const tbody = row.closest("tbody");
     tbody.remove();
+}
+
+function submitData() {
+    const planning = [];
+    const workload = [];
+
+    // Collect planning data
+    document.querySelectorAll('.project-group').forEach(group => {
+        const rows = group.querySelectorAll('tr');
+        const projectSelect = group.querySelector('select[name="project[]"]');
+        const projectName = projectSelect ? projectSelect.value : null;
+        const tasks = [];
+
+        rows.forEach(row => {
+            const taskInput = row.querySelector('input[name="task_description[]"]');
+            const hoursSelect = row.querySelector('select[name="hours[]"]');
+            const assignedSelect = row.querySelector('select[name="assigned_to[][]"]');
+
+            if (taskInput && hoursSelect && assignedSelect && taskInput.value.trim() !== "") {
+                tasks.push({
+                    task_description: taskInput.value.trim(),
+                    assigned_to: assignedSelect.value,
+                    hours: parseFloat(hoursSelect.value)
+                });
+            }
+        });
+
+        if (projectName && tasks.length > 0) {
+            planning.push({
+                project_name: projectName,
+                tasks: tasks
+            });
+        }
+    });
+
+    // Collect workload data
+    document.querySelectorAll('.workload-table tbody tr').forEach(row => {
+        const cells = row.querySelectorAll('td');
+        if (cells.length === 4) {
+            workload.push({
+                firstname: cells[0].innerText.trim(),
+                allocated: parseFloat(cells[1].innerText.trim()),
+                left: parseFloat(cells[2].innerText.trim()),
+                Task: parseInt(cells[3].innerText.trim())
+            });
+        }
+    });
+
+    const jsonData = {
+        planning: planning,
+        workload: workload
+    };
+
+    
+
+    // Send via AJAX (Fetch API)
+    fetch('includes/submit_planning.php', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(jsonData)
+    })
+    .then(response => response.text())
+    .then(data => {
+        alert('Data submitted successfully!');
+        console.log('Server response:', data);
+    
+        // Update the workload table
+        const rows = document.querySelectorAll('.workload-table tbody tr');
+    
+        rows.forEach(row => {
+            const nameCell = row.querySelector('td');
+            const name = nameCell.innerText.trim().toUpperCase();
+    
+            const matchingUser = workload.find(user => user.firstname.toUpperCase() === name);
+            if (matchingUser) {
+                row.cells[1].innerText = matchingUser.allocated; // Allocated
+                row.cells[2].innerText = matchingUser.left;      // Left
+                row.cells[3].innerText = matchingUser.Task;      // Tasks
+    
+                // Re-apply colors just in case
+                row.cells[1].style.background = 'lightgreen';
+                row.cells[2].style.background = 'lightblue';
+                row.cells[3].style.background = 'orange';
+            }
+        });
+    })
+    
+    
+    .catch(error => {
+        console.error('Error submitting data:', error);
+        alert('Submission failed. See console for details.');
+    });
 }
