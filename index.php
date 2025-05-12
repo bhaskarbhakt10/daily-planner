@@ -9,7 +9,7 @@ while ($row = $result->fetch_assoc()) {
     $projects[] = $row['Project_Name'];
 }
 
-$result = $conn->query("SELECT firstname FROM users");
+$result = $conn->query("SELECT firstname FROM users Where is_active = '1' AND id NOT IN (1, 27, 38)");
 while ($row = $result->fetch_assoc()) {
     $users[] = $row['firstname'];
 }

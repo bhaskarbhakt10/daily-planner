@@ -46,4 +46,20 @@ if ($stmt->execute()) {
 }
 
 
+if ($stmt->execute()) {
+    header('Content-Type: application/json');
+    echo json_encode([
+        'status' => 'success',
+        'updatedWorkload' => array_values($workloadMap)
+    ]);
+} else {
+    http_response_code(500);
+    echo json_encode([
+        'status' => 'error',
+        'message' => 'Error saving data.'
+    ]);
+}
+
+
+
 ?>

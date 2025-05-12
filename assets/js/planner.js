@@ -28,9 +28,11 @@ function addMainRow() {
         </td>
     `;
     tbody.appendChild(row);
+    attachLiveUpdateListeners(row);
     table.appendChild(tbody);
-}
+    
 
+}
 
 function addSubRow(button) {
     const row = button.closest("tr");
@@ -58,7 +60,65 @@ function addSubRow(button) {
     `;
 
     tbody.appendChild(newRow);
+    attachLiveUpdateListeners(newRow);
+
+
 }
+
+function attachLiveUpdateListeners(row) {
+    const hoursSelect = row.querySelector('select[name="hours[]"]');
+    const assignedSelect = row.querySelector('select[name="assigned_to[][]"]');
+
+    let prevDev = null;
+    let prevHours = 0;
+
+    function updateWorkloadTable() {
+        const dev = assignedSelect.value.toUpperCase();
+        const hours = parseFloat(hoursSelect.value);
+
+        if (!dev || isNaN(hours)) return;
+
+        const rows = document.querySelectorAll('.workload-table tbody tr');
+        const rowMap = {};
+
+        rows.forEach(r => {
+            const name = r.cells[0].textContent.trim().toUpperCase();
+            rowMap[name] = r;
+        });
+
+        // Remove previous allocation
+        if (prevDev && rowMap[prevDev]) {
+            const r = rowMap[prevDev];
+            let alloc = parseFloat(r.cells[1].textContent);
+            let left = parseFloat(r.cells[2].textContent);
+            let tasks = parseInt(r.cells[3].textContent);
+
+            r.cells[1].textContent = alloc - prevHours;
+            r.cells[2].textContent = left + prevHours;
+            r.cells[3].textContent = Math.max(0, tasks - 1);
+        }
+
+        // Add new allocation
+        if (dev && rowMap[dev]) {
+            const r = rowMap[dev];
+            let alloc = parseFloat(r.cells[1].textContent);
+            let left = parseFloat(r.cells[2].textContent);
+            let tasks = parseInt(r.cells[3].textContent);
+
+            r.cells[1].textContent = alloc + hours;
+            r.cells[2].textContent = left - hours;
+            r.cells[3].textContent = tasks + 1;
+        }
+
+        prevDev = dev;
+        prevHours = hours;
+    }
+
+    hoursSelect.addEventListener('change', updateWorkloadTable);
+    assignedSelect.addEventListener('change', updateWorkloadTable);
+}
+
+
 
 
 
@@ -175,31 +235,40 @@ function submitData() {
         },
         body: JSON.stringify(jsonData)
     })
-    .then(response => response.text())
+    .then(response => response.json())
     .then(data => {
+    if (data.status === 'success') {
         alert('Data submitted successfully!');
-        console.log('Server response:', data);
-    
-        // Update the workload table
+
+        const updatedWorkload = data.updatedWorkload;
+
         const rows = document.querySelectorAll('.workload-table tbody tr');
-    
+
         rows.forEach(row => {
             const nameCell = row.querySelector('td');
             const name = nameCell.innerText.trim().toUpperCase();
-    
-            const matchingUser = workload.find(user => user.firstname.toUpperCase() === name);
+
+            const matchingUser = updatedWorkload.find(user => user.firstname.toUpperCase() === name);
             if (matchingUser) {
-                row.cells[1].innerText = matchingUser.allocated; // Allocated
-                row.cells[2].innerText = matchingUser.left;      // Left
-                row.cells[3].innerText = matchingUser.Task;      // Tasks
-    
-                // Re-apply colors just in case
-                row.cells[1].style.background = 'lightgreen';
-                row.cells[2].style.background = 'lightblue';
-                row.cells[3].style.background = 'orange';
+                row.cells[1].innerText = matchingUser.allocated;
+                row.cells[2].innerText = matchingUser.left;
+                row.cells[3].innerText = matchingUser.Task;
+            } else {
+                row.cells[1].innerText = '0';
+                row.cells[2].innerText = '8';
+                row.cells[3].innerText = '0';
             }
+
+            // Apply colors
+            row.cells[1].style.background = 'lightgreen';
+            row.cells[2].style.background = 'lightblue';
+            row.cells[3].style.background = 'orange';
         });
-    })
+    } else {
+        alert('Submission failed: ' + data.message);
+    }
+})
+
     
     
     .catch(error => {
