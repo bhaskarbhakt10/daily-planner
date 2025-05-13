@@ -3,9 +3,11 @@ require '../config/db.php';
 
 $data = json_decode(file_get_contents("php://input"), true);
 
+header('Content-Type: application/json'); // always return JSON
+
 if (!$data || !isset($data['planning']) || !isset($data['workload'])) {
     http_response_code(400);
-    echo "Invalid data.";
+    echo json_encode(['status' => 'error', 'message' => 'Invalid data.']);
     exit;
 }
 
@@ -29,25 +31,16 @@ foreach ($data['planning'] as $project) {
     }
 }
 
-// 3. Insert the updated data into the table
+// 3. Insert into DB
 $finalJson = json_encode([
     'planning' => $data['planning'],
-    'workload' => array_values($workloadMap) // ensures it's a regular array again
+    'workload' => array_values($workloadMap)
 ]);
 
 $stmt = $conn->prepare("INSERT INTO daily_planning_data (data) VALUES (?)");
 $stmt->bind_param("s", $finalJson);
 
 if ($stmt->execute()) {
-    echo "Data saved successfully.";
-} else {
-    http_response_code(500);
-    echo "Error saving data.";
-}
-
-
-if ($stmt->execute()) {
-    header('Content-Type: application/json');
     echo json_encode([
         'status' => 'success',
         'updatedWorkload' => array_values($workloadMap)
@@ -59,7 +52,4 @@ if ($stmt->execute()) {
         'message' => 'Error saving data.'
     ]);
 }
-
-
-
 ?>

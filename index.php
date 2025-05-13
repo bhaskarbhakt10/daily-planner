@@ -19,6 +19,8 @@ while ($row = $result->fetch_assoc()) {
 <head>
     <title>Daily Planner</title>
     <link rel="stylesheet" href="assets/css/style.css">
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    
 </head>
 <body>
 <div class="layout-wrapper">
@@ -35,6 +37,8 @@ while ($row = $result->fetch_assoc()) {
     const users = <?= json_encode($users) ?>;
     const hours = <?= json_encode($hours) ?>;
 </script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> <!-- Required for Select2 -->
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <script src="assets/js/planner.js"></script>
 </body>
 

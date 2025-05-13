@@ -6,7 +6,7 @@ function addMainRow() {
     const row = document.createElement("tr");
     row.innerHTML = `
         <td rowspan="1" class="project-cell">
-            <select name="project[]">
+            <select name="project[]" class="searchable-dropdown">
                 ${projects.map(p => `<option value="${p}">${p}</option>`).join('')}
             </select>
         </td>
@@ -17,7 +17,7 @@ function addMainRow() {
             </select>
         </td>
         <td>
-            <select name="assigned_to[][]">
+            <select name="assigned_to[][]" class="searchable-dropdown">
                 ${users.map(u => `<option value="${u}">${u}</option>`).join('')}
             </select>
             <button type="button" class="action-btn remove" style="margin-top: 4px;" onclick="removeSubRow(this)">Remove</button>
@@ -28,11 +28,11 @@ function addMainRow() {
         </td>
     `;
     tbody.appendChild(row);
-    attachLiveUpdateListeners(row);
     table.appendChild(tbody);
-    
+    refreshSelect2();
 
 }
+
 
 function addSubRow(button) {
     const row = button.closest("tr");
@@ -51,7 +51,7 @@ function addSubRow(button) {
             </select>
         </td>
         <td>
-            <select name="assigned_to[][]">
+            <select name="assigned_to[][]" class="searchable-dropdown">
                 ${users.map(u => `<option value="${u}">${u}</option>`).join('')}
             </select>
             <button type="button" class="action-btn remove" style="margin-top: 4px;" onclick="removeSubRow(this)">Remove</button>
@@ -60,65 +60,36 @@ function addSubRow(button) {
     `;
 
     tbody.appendChild(newRow);
-    attachLiveUpdateListeners(newRow);
+    refreshSelect2();
 
 
 }
 
-function attachLiveUpdateListeners(row) {
-    const hoursSelect = row.querySelector('select[name="hours[]"]');
-    const assignedSelect = row.querySelector('select[name="assigned_to[][]"]');
+// function refreshSelect2() {
+//     $('.searchable-dropdown').each(function () {
+//         // Remove previous instance if any
+//         if ($(this).hasClass("select2-hidden-accessible")) {
+//             $(this).select2('destroy');
+//         }
 
-    let prevDev = null;
-    let prevHours = 0;
+//         // Initialize select2 again
+//         $(this).select2({
+//             width: 'style', // Or use 'resolve' if you want it to auto-size
+//             placeholder: 'Select an option'
+//         });
+//     });
+// }
 
-    function updateWorkloadTable() {
-        const dev = assignedSelect.value.toUpperCase();
-        const hours = parseFloat(hoursSelect.value);
-
-        if (!dev || isNaN(hours)) return;
-
-        const rows = document.querySelectorAll('.workload-table tbody tr');
-        const rowMap = {};
-
-        rows.forEach(r => {
-            const name = r.cells[0].textContent.trim().toUpperCase();
-            rowMap[name] = r;
-        });
-
-        // Remove previous allocation
-        if (prevDev && rowMap[prevDev]) {
-            const r = rowMap[prevDev];
-            let alloc = parseFloat(r.cells[1].textContent);
-            let left = parseFloat(r.cells[2].textContent);
-            let tasks = parseInt(r.cells[3].textContent);
-
-            r.cells[1].textContent = alloc - prevHours;
-            r.cells[2].textContent = left + prevHours;
-            r.cells[3].textContent = Math.max(0, tasks - 1);
+function refreshSelect2() {
+    $('.searchable-dropdown').each(function () {
+        if (!$(this).hasClass("select2-hidden-accessible")) {
+            $(this).select2({
+                width: 'resolve',
+                placeholder: 'Select an option'
+            });
         }
-
-        // Add new allocation
-        if (dev && rowMap[dev]) {
-            const r = rowMap[dev];
-            let alloc = parseFloat(r.cells[1].textContent);
-            let left = parseFloat(r.cells[2].textContent);
-            let tasks = parseInt(r.cells[3].textContent);
-
-            r.cells[1].textContent = alloc + hours;
-            r.cells[2].textContent = left - hours;
-            r.cells[3].textContent = tasks + 1;
-        }
-
-        prevDev = dev;
-        prevHours = hours;
-    }
-
-    hoursSelect.addEventListener('change', updateWorkloadTable);
-    assignedSelect.addEventListener('change', updateWorkloadTable);
+    });
 }
-
-
 
 
 
@@ -267,12 +238,64 @@ function submitData() {
     } else {
         alert('Submission failed: ' + data.message);
     }
-})
-
-    
-    
+})   
     .catch(error => {
         console.error('Error submitting data:', error);
         alert('Submission failed. See console for details.');
     });
 }
+
+
+$(document).ready(function () {
+    function updateWorkloadTable() {
+        // Reset the workload table to zero
+        const workload = {};
+
+        // Loop through each planner task row
+        $('#taskTable tbody tr').each(function () {
+            const $row = $(this);
+            const hours = parseFloat($row.find('select[name="hours[]"]').val()) || 0;
+
+            // Handle all assigned developers in this row
+            $row.find('select[name="assigned_to[][]"]').each(function () {
+                const user = $(this).val();
+                if (!user) return;
+
+                const username = user.toUpperCase();
+
+                if (!workload[username]) {
+                    workload[username] = { allocated: 0, tasks: 0 };
+                }
+
+                workload[username].allocated += hours;
+                workload[username].tasks += 1;
+            });
+        });
+
+        // Update the workload table
+        $('.workload-row').each(function () {
+            const $row = $(this);
+            const name = $row.data('name'); // already uppercase
+            const data = workload[name];
+
+            const allocated = data ? data.allocated : 0;
+            const left = 8 - allocated;
+            const tasks = data ? data.tasks : 0;
+
+            $row.find('td').eq(1).text(allocated); // Allocated
+            $row.find('td').eq(2).text(left);      // Left
+            $row.find('td').eq(3).text(tasks);     // Tasks
+        });
+    }
+
+    // Bind change events to update workload live
+    $(document).on('input change', '#taskTable select, #taskTable input', updateWorkloadTable);
+
+    // Also trigger after adding/removing rows
+    $(document).on('click', '.add, .remove', function () {
+        setTimeout(updateWorkloadTable, 100); // slight delay for DOM changes
+    });
+
+    // Initial calculation
+    updateWorkloadTable();
+});

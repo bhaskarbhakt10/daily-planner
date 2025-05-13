@@ -10,14 +10,19 @@
                 </tr>
             </thead>
             <tbody class="project-group">
+                <!-- CSS -->
+            <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+
+            <!-- JS -->
+            <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> <!-- Required for Select2 -->
+            <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
             <tr>
             <td rowspan="1" class="project-cell">
-            <select name="project[]">
+            <select name="project[]" class="searchable-dropdown">
                 <?php foreach ($projects as $project): ?>
                     <option value="<?= htmlspecialchars($project) ?>"><?= htmlspecialchars($project) ?></option>
                 <?php endforeach; ?>
             </select>
-
             </td>
                 <td><input type="text" name="task_description[]" /></td>
                 <td>
@@ -28,7 +33,7 @@
                     </select>
                 </td>
                 <td>
-                <select name="assigned_to[][]">
+                <select name="assigned_to[][]" class="searchable-dropdown">
                     <?php foreach ($users as $user): ?>
                         <option value="<?= htmlspecialchars($user) ?>"><?= htmlspecialchars($user) ?></option>
                     <?php endforeach; ?>
@@ -50,3 +55,11 @@
         <button type="button" id="submitBtn" onclick="submitData()">Submit</button>
         
     </form>
+
+    <script>
+$(document).ready(function() {
+    $('.searchable-dropdown').select2({
+        width: 'resolve' // Adjust width to fit the cell
+    });
+});
+</script>
