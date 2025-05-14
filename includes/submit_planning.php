@@ -37,8 +37,17 @@ $finalJson = json_encode([
     'workload' => array_values($workloadMap)
 ]);
 
-$stmt = $conn->prepare("INSERT INTO daily_planning_data (data) VALUES (?)");
-$stmt->bind_param("s", $finalJson);
+$date = isset($data['date']) ? $data['date'] : null;
+
+if (!$date) {
+    http_response_code(400);
+    echo json_encode(['status' => 'error', 'message' => 'Date is missing.']);
+    exit;
+}
+
+$stmt = $conn->prepare("INSERT INTO daily_planning_data (data, plan_date) VALUES (?, ?)");
+$stmt->bind_param("ss", $finalJson, $date);
+
 
 if ($stmt->execute()) {
     echo json_encode([

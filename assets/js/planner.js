@@ -145,9 +145,38 @@ function removeRow(button) {
     tbody.remove();
 }
 
+document.addEventListener('DOMContentLoaded', function () {
+    
+    const urlParams = new URLSearchParams(window.location.search);
+    const hasDateParam = urlParams.has('selected_date');
+    const dateInput = document.getElementById('selected_date');
+    if (dateInput && !hasDateParam) {
+        const today = new Date().toISOString().split('T')[0];
+        dateInput.value = today;
+    }
+
+    
+    const submitBtn = document.getElementById('submit_btn');
+    if (submitBtn) {
+        submitBtn.addEventListener('click', submitData); // Hook up your submitData function
+    }
+
+    
+    console.log('DOM fully loaded and ready!');
+});
+
+
 function submitData() {
     const planning = [];
     const workload = [];
+
+    const selectedDateInput = document.getElementById('hidden_date');
+    const selectedDate = selectedDateInput ? selectedDateInput.value : null;
+
+    if (!selectedDate) {
+        alert('Please select a date before submitting.');
+        return;
+    }
 
     // Collect planning data
     document.querySelectorAll('.project-group').forEach(group => {
@@ -192,6 +221,7 @@ function submitData() {
     });
 
     const jsonData = {
+        date: selectedDate,
         planning: planning,
         workload: workload
     };
@@ -238,11 +268,11 @@ function submitData() {
     } else {
         alert('Submission failed: ' + data.message);
     }
-})   
-    .catch(error => {
-        console.error('Error submitting data:', error);
-        alert('Submission failed. See console for details.');
-    });
+    })   
+        .catch(error => {
+            console.error('Error submitting data:', error);
+            alert('Submission failed. See console for details.');
+        });
 }
 
 

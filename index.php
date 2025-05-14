@@ -15,6 +15,20 @@ while ($row = $result->fetch_assoc()) {
 }
 ?>
 
+<form method="GET" style="margin: 20px;">
+    <label for="selected_date">Select Date:</label>
+    <input 
+        type="date" 
+        id="selected_date" 
+        name="selected_date" 
+        value="<?php echo isset($_GET['selected_date']) ? $_GET['selected_date'] : date('Y-m-d'); ?>" 
+        onchange="this.form.submit()"
+    >
+</form>
+<input type="hidden" id="hidden_date" value="<?php echo $_GET['selected_date'] ?? date('Y-m-d'); ?>">
+
+
+
 <div class="layout-wrapper">
     <div class="left-panel">
         <?php include 'templates/planner_form.php'; ?>
