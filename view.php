@@ -39,108 +39,84 @@ while ($row = $result->fetch_assoc()) {
 
 $projects = array_keys($projectsSet);
 $days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+
+$result = $conn->query("SELECT firstname FROM users Where is_active = '1' AND id NOT IN (1, 27, 38)");
+while ($row = $result->fetch_assoc()) {
+    $users[] = $row['firstname'];
+}
+
 ?>
 
-<style>
-.container {
-    overflow-x: auto;
-    max-width: 100%;
-}
+<div class="layout-wrapper2">
+    <div class="left-panel2">
+        <div class="container2">
+          <table class="week-planner">
+            <thead>
+              <tr>
+                <th class="sticky-col">PROJECTS</th>
+                <?php foreach (['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'] as $day): ?>
+                  <th colspan="3" class="clickable-day" data-day="<?= strtolower($day) ?>"><?= $day ?></th>
+                <?php endforeach; ?>
 
-.week-planner {
-    border-collapse: collapse;
-    min-width: 1000px;
-}
+              </tr>
+              <tr>
+                <th class="sticky-col"></th>
+                <?php for ($i = 0; $i < 6; $i++): ?>
+                  <th>Task</th>
+                  <th>Hours</th>
+                  <th>Assigned To</th>
+                <?php endfor; ?>
+              </tr>
+            </thead>
+            <tbody>
+<?php foreach ($projects as $project): ?>
+    <?php
+    // Find max rows needed for this project
+    $maxRows = 0;
+    foreach ($days as $day) {
+        $count = isset($weekData[$day][$project]) ? count($weekData[$day][$project]) : 0;
+        if ($count > $maxRows) {
+            $maxRows = $count;
+        }
+    }
 
-.week-planner th, .week-planner td {
-    border: 1px solid #ccc;
-    padding: 10px;
-    min-width: 160px;
-    vertical-align: top;
-    background: #fff;
-    font-size: 13px;
-}
+    for ($i = 0; $i < $maxRows; $i++): ?>
+    <tr class="<?= ($i + 1 === $maxRows) ? 'project-separator' : '' ?>">
 
-.week-planner th {
-    background: rgb(16, 57, 129); /* Deep blue */
-    color: #fff;
-    text-align: center;
-    font-weight: bold;
-}
+        <?php if ($i == 0): ?>
+            <td class="sticky-col" rowspan="<?= $maxRows ?>"><?= htmlspecialchars($project) ?></td>
+        <?php endif; ?>
 
-.sticky-col {
-    position: sticky;
-    left: 0;
-    background: #fff;
-    z-index: 1;
-    min-width: 180px;
-    max-width: 180px;
-}
-
-thead .sticky-col {
-    background: rgb(16, 57, 129); /* Deep blue */
-    color: #fff;
-    z-index: 2;
-}
-
-input[type="text"] {
-  width: 100%;
-  padding: 6px;
-  font-size: 13px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  box-sizing: border-box;
-}
-
-</style>
-
-
-<div class="container">
-  <table class="week-planner">
-    <thead>
-      <tr>
-        <th class="sticky-col">PROJECTS</th>
-        <?php foreach (['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'] as $day): ?>
-          <th colspan="3"><?= $day ?></th>
+        <?php foreach ($days as $day): ?>
+            <?php
+            $task = $weekData[$day][$project][$i] ?? ['task' => '', 'hours' => '', 'user' => ''];
+            ?>
+            <td>
+                <input type="text" name="task_description[<?= $project ?>][<?= $day ?>][]" value="<?= htmlspecialchars($task['task']) ?>" />
+            </td>
+            <td>
+                <input type="text" name="hours[<?= $project ?>][<?= $day ?>][]" value="<?= htmlspecialchars($task['hours']) ?>" />
+            </td>
+            <td>
+                <input type="text" name="assigned_to[<?= $project ?>][<?= $day ?>][]" value="<?= htmlspecialchars($task['user']) ?>" />
+            </td>
         <?php endforeach; ?>
-      </tr>
-      <tr>
-        <th class="sticky-col"></th>
-        <?php for ($i = 0; $i < 6; $i++): ?>
-          <th>Task</th>
-          <th>Hours</th>
-          <th>Assigned To</th>
-        <?php endfor; ?>
-      </tr>
-    </thead>
-    <tbody>
-      <?php foreach ($projects as $project): ?>
-        <tr>
-          <td class="sticky-col"><?= htmlspecialchars($project) ?></td>
-          <?php for ($i = 0; $i < 6; $i++): ?>
-            <td>
-              <input type="text" name="task_description[<?= $project ?>][]" />
-            </td>
-            <td>
-              <input type="text" name="hours[<?= $project ?>][]" />
-            </td>
-            <td>
-              <input type="text" name="assigned_to[<?= $project ?>][]" />
-            </td>
-          <?php endfor; ?>
-        </tr>
-      <?php endforeach; ?>
-    </tbody>
-  </table>
+    </tr>
+    <?php endfor; ?>
+<?php endforeach; ?>
+</tbody>
+
+
+
+          </table>
+        </div>
+    </div>
+
+    <div class="right-panel2">
+        <?php include 'templates/workload_table.php'; ?>
+    </div>
 </div>
 
-
-
-<script>
-$(document).ready(function() {
-  $('.searchable-dropdown').select2({ width: 'resolve' });
-});
-</script>
 
 
 <?php require_once 'templates/footer.php'; ?>

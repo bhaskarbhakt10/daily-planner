@@ -15,6 +15,7 @@ while ($row = $result->fetch_assoc()) {
 }
 ?>
 
+
 <form method="GET" style="margin: 20px;">
     <label for="selected_date">Select Date:</label>
     <input 
@@ -27,6 +28,16 @@ while ($row = $result->fetch_assoc()) {
 </form>
 <input type="hidden" id="hidden_date" value="<?php echo $_GET['selected_date'] ?? date('Y-m-d'); ?>">
 
+<!-- <div style="margin: 20px;">
+    <label for="selected_date">Select Date:</label>
+    <input 
+        type="text" 
+        id="selected_date" 
+        readonly 
+        style="cursor: pointer; width: 150px; padding: 6px;"
+    >
+</div> -->
+
 
 
 <div class="layout-wrapper">
@@ -38,5 +49,6 @@ while ($row = $result->fetch_assoc()) {
         <?php include 'templates/workload_table.php'; ?>
     </div>
 </div>
+
 <?php require_once 'templates/footer.php'; ?>
 

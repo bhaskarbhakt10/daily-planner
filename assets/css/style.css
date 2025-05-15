@@ -110,3 +110,92 @@ button[type="button"]:not(.action-btn):hover {
 }
 
 .indent { padding-left: 25px; }
+
+
+.layout-wrapper2 {
+  display: flex;
+  align-items: flex-start;
+  gap: 20px;
+  padding: 20px;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  overflow-x: hidden;
+}
+
+.left-panel2 {
+  flex: 3;
+  margin-right: 20px;
+  min-width: 0; /* Prevent flex child from growing outside bounds */
+}
+
+.container2 {
+  overflow-x: auto;
+  width: 100%;
+  max-width: 100%;
+}
+
+.week-planner {
+  border-collapse: collapse;
+  width: max-content;
+  min-width: 1000px;
+}
+
+.week-planner th,
+.week-planner td {
+  border: 1px solid #ccc;
+  padding: 10px;
+  min-width: 160px;
+  vertical-align: top;
+  background: #fff;
+  font-size: 13px;
+}
+
+.week-planner th {
+  background: rgb(16, 57, 129);
+  color: #fff;
+  text-align: center;
+  font-weight: bold;
+}
+
+.sticky-col {
+  position: sticky;
+  left: 0;
+  background: #fff;
+  z-index: 1;
+  min-width: 180px;
+  max-width: 180px;
+}
+
+thead .sticky-col {
+  background: rgb(16, 57, 129);
+  color: #fff;
+  z-index: 2;
+}
+
+.right-panel2 {
+  flex: 1;
+  min-width: 300px;
+}
+
+input[type="text"] {
+  width: 100%;
+  padding: 6px;
+  font-size: 13px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+body {
+  overflow-x: hidden;
+}
+
+.project-separator td {
+    border-bottom: 2px solid #ccc;
+}
+
+ .clickable-day {
+      cursor: pointer;
+      background-color: #1e90ff;
+  }

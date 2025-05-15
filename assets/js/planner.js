@@ -80,16 +80,52 @@ function addSubRow(button) {
 //     });
 // }
 
+// function refreshSelect2() {
+//     $('.searchable-dropdown').each(function () {
+//         if (!$(this).hasClass("select2-hidden-accessible")) {
+//             $(this).select2({
+//                 width: 'resolve',
+//                 placeholder: 'Select an option'
+//             });
+//         }
+//     });
+// }
+
 function refreshSelect2() {
+    // Defer to ensure Select2 is loaded
+    if (typeof $.fn.select2 !== 'function') {
+        console.warn('Select2 is not loaded yet.');
+        return;
+    }
+
     $('.searchable-dropdown').each(function () {
-        if (!$(this).hasClass("select2-hidden-accessible")) {
-            $(this).select2({
-                width: 'resolve',
-                placeholder: 'Select an option'
-            });
+        const $select = $(this);
+
+        // Destroy previous instance
+        if ($select.hasClass("select2-hidden-accessible")) {
+            $select.select2('destroy');
         }
+
+        // Re-init
+        $select.select2({
+            width: 'resolve',
+            placeholder: 'Select an option'
+        });
     });
 }
+
+
+$(document).ready(function () {
+    if (typeof $.fn.select2 !== 'function') {
+        console.error('Select2 not loaded!');
+        return;
+    }
+
+    $('.searchable-dropdown').select2({
+        width: 'resolve'
+    });
+});
+
 
 
 
@@ -165,6 +201,18 @@ document.addEventListener('DOMContentLoaded', function () {
     console.log('DOM fully loaded and ready!');
 });
 
+// $(function () {
+//   //Datepicker
+//   const today = new Date().toISOString().split('T')[0];
+//   $("#selected_date").datepicker({
+//       dateFormat: "yy-mm-dd",
+//       defaultDate: today,
+//       onSelect: function (dateText) {
+//           $("#hidden_date").val(dateText);
+          
+//       }
+//   }).datepicker("setDate", today);
+// });
 
 function submitData() {
     const planning = [];
@@ -328,4 +376,20 @@ $(document).ready(function () {
 
     // Initial calculation
     updateWorkloadTable();
+});
+
+
+document.querySelectorAll('.clickable-day').forEach(function(header) {
+    console.log('Attaching click to:', header); // <== add this
+    header.addEventListener('click', function() {
+        const day = this.getAttribute('data-day');
+        console.log('Clicked day:', day); // <== add this
+
+        fetch('includes/fetch_workload.php?day=' + day)
+            .then(res => res.text())
+            .then(html => {
+                document.querySelector('.right-panel2').innerHTML = html;
+            })
+            .catch(err => console.error('Error loading workload:', err));
+    });
 });
