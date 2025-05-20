@@ -15,9 +15,10 @@
             <td rowspan="1" class="project-cell">
             <select name="project[]" class="searchable-dropdown">
                 <?php foreach ($projects as $project): ?>
-                    <option value="<?= htmlspecialchars($project) ?>"><?= htmlspecialchars($project) ?></option>
+                    <option value="<?= $project['id'] ?>"><?= htmlspecialchars($project['name']) ?></option>
                 <?php endforeach; ?>
             </select>
+
             </td>
                 <td><input type="text" name="task_description[]" /></td>
                 <td>
@@ -28,11 +29,12 @@
                     </select>
                 </td>
                 <td>
-                <select name="assigned_to[][]" class="searchable-dropdown">
+                <select name="assigned_to[]" class="searchable-dropdown">
                     <?php foreach ($users as $user): ?>
-                        <option value="<?= htmlspecialchars($user) ?>"><?= htmlspecialchars($user) ?></option>
+                        <option value="<?= $user['id'] ?>"><?= htmlspecialchars($user['name']) ?></option>
                     <?php endforeach; ?>
                 </select>
+
 
                     <button type="button" class="action-btn remove" style="margin-top: 4px;" onclick="removeSubRow(this)">Remove</button>
                 </td>

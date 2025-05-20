@@ -4,14 +4,30 @@ $projects = [];
 $users = [];
 $hours = ["0.5", "1", "1.5", "2", "2.5", "3", "3.5", "4", "5", "6", "7", "8"];
 
-$result = $conn->query("SELECT Project_Name FROM projects");
+// $result = $conn->query("SELECT Project_Name FROM projects");
+// while ($row = $result->fetch_assoc()) {
+//     $projects[] = $row['Project_Name'];
+// }
+
+// $result = $conn->query("SELECT firstname FROM users Where is_active = '1' AND id NOT IN (1, 27, 38)");
+// while ($row = $result->fetch_assoc()) {
+//     $users[] = $row['firstname'];
+// }
+
+$result = $conn->query("SELECT Project_Id, Project_Name FROM projects");
 while ($row = $result->fetch_assoc()) {
-    $projects[] = $row['Project_Name'];
+    $projects[] = [
+        'id' => $row['Project_Id'],
+        'name' => $row['Project_Name']
+    ];
 }
 
-$result = $conn->query("SELECT firstname FROM users Where is_active = '1' AND id NOT IN (1, 27, 38)");
+$result = $conn->query("SELECT id, firstname FROM users WHERE is_active = '1' AND id NOT IN (1, 27, 38)");
 while ($row = $result->fetch_assoc()) {
-    $users[] = $row['firstname'];
+    $users[] = [
+        'id' => $row['id'],
+        'name' => $row['firstname']
+    ];
 }
 ?>
 

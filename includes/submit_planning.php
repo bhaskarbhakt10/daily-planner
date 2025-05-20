@@ -1,9 +1,17 @@
 <?php
 require '../config/db.php';
 
+file_put_contents('debug.log', print_r($_POST, true));
+
+
 $data = json_decode(file_get_contents("php://input"), true);
 
 header('Content-Type: application/json'); // always return JSON
+error_reporting(E_ERROR); // suppress warnings/notices
+ini_set('display_errors', 0);
+
+
+// echo json_encode(['status' => 'success', 'updatedWorkload' => $updatedData]);
 
 if (!$data || !isset($data['planning']) || !isset($data['workload'])) {
     http_response_code(400);
@@ -14,22 +22,24 @@ if (!$data || !isset($data['planning']) || !isset($data['workload'])) {
 // 1. Build a map of workload users
 $workloadMap = [];
 foreach ($data['workload'] as &$person) {
-    $workloadMap[strtoupper($person['firstname'])] = &$person; // Use reference for updates
+    $workloadMap[$person['user-id']] = &$person; // Use numeric ID, no strtoupper
 }
+
 
 // 2. Update workload based on planning tasks
 foreach ($data['planning'] as $project) {
     foreach ($project['tasks'] as $task) {
-        $assignee = strtoupper($task['assigned_to']);
+        $assigneeId = $task['assigned_to']; // user_id now
         $hours = floatval($task['hours']);
 
-        if (isset($workloadMap[$assignee])) {
-            $workloadMap[$assignee]['allocated'] += $hours;
-            $workloadMap[$assignee]['left'] -= $hours;
-            $workloadMap[$assignee]['Task'] += 1;
+        if (isset($workloadMap[$assigneeId])) {
+            $workloadMap[$assigneeId]['allocated'] += $hours;
+            $workloadMap[$assigneeId]['left'] -= $hours;
+            $workloadMap[$assigneeId]['Task'] += 1;
         }
     }
 }
+
 
 // 3. Insert into DB
 $finalJson = json_encode([

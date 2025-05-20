@@ -10,10 +10,11 @@
             </tr>
         </thead>
         <tbody>
+            <!-- <?php var_dump($user); ?> -->
+    
             <?php foreach ($users as $user): ?>
-                <tr class="workload-row" data-name="<?= htmlspecialchars(strtoupper($user)) ?>" style="text-align: center;">
-
-                    <td><?= htmlspecialchars(strtoupper($user)) ?></td>
+                <tr class="workload-row" data-user-id="<?= $user['id'] ?>" data-name="<?= strtoupper($user['name']) ?>">
+                    <td><?= htmlspecialchars(strtoupper($user['name'])) ?></td>
                     <td style="background: lightgreen;">0</td> <!-- Placeholder Allocated -->
                     <td style="background: lightblue;">8</td> <!-- Placeholder Left -->
                     <td style="background: orange;">0</td> <!-- Placeholder Tasks -->
