@@ -10,19 +10,20 @@
             </tr>
         </thead>
         <tbody>
-            <!-- <?php var_dump($user); ?> -->
+            
     
             
             <?php foreach ($users as $user): ?>
     <tr class="workload-row"
-        data-user-id="<?= $user ?>"
-        data-name="<?= strtoupper((string) $user) ?>">
-        <td><?= htmlspecialchars(strtoupper($user)) ?></td>
+        data-user-id="<?= $user['id'] ?>"
+        data-name="<?= strtoupper((string) $user['id']) ?>">
+        <td><?= htmlspecialchars(strtoupper($user['name'])) ?></td>
         <td style="background: lightgreen;">0</td>
         <td style="background: lightblue;">8</td>
         <td style="background: orange;">0</td>
     </tr>
 <?php endforeach; ?>
+
 
         </tbody>
     </table>

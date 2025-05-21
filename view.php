@@ -52,11 +52,17 @@ if (!empty($projects)) {
 }
 
 // Fetch users
+// $users = [];
+// $result = $conn->query("SELECT id, firstname FROM users WHERE is_active = '1' AND id NOT IN (1, 27, 38)");
+// while ($row = $result->fetch_assoc()) {
+//     $users[$row['id']] = $row['firstname'];
+// }
 $users = [];
 $result = $conn->query("SELECT id, firstname FROM users WHERE is_active = '1' AND id NOT IN (1, 27, 38)");
 while ($row = $result->fetch_assoc()) {
-    $users[$row['id']] = $row['firstname'];
+    $users[] = ['id' => $row['id'], 'name' => $row['firstname']];
 }
+
 ?>
 
 <!-- Include jQuery and jQuery UI -->
