@@ -12,14 +12,18 @@
         <tbody>
             <!-- <?php var_dump($user); ?> -->
     
+            
             <?php foreach ($users as $user): ?>
-                <tr class="workload-row" data-user-id="<?= $user['id'] ?>" data-name="<?= strtoupper($user['name']) ?>">
-                    <td><?= htmlspecialchars(strtoupper($user['name'])) ?></td>
-                    <td style="background: lightgreen;">0</td> <!-- Placeholder Allocated -->
-                    <td style="background: lightblue;">8</td> <!-- Placeholder Left -->
-                    <td style="background: orange;">0</td> <!-- Placeholder Tasks -->
-                </tr>
-            <?php endforeach; ?>
+    <tr class="workload-row"
+        data-user-id="<?= $user ?>"
+        data-name="<?= strtoupper((string) $user) ?>">
+        <td><?= htmlspecialchars(strtoupper($user)) ?></td>
+        <td style="background: lightgreen;">0</td>
+        <td style="background: lightblue;">8</td>
+        <td style="background: orange;">0</td>
+    </tr>
+<?php endforeach; ?>
+
         </tbody>
     </table>
 </div>

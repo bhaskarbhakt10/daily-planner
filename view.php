@@ -75,12 +75,13 @@ $(function () {
                     position: i + 1
                 });
             });
-            $.post("update_project_order.php", { order: JSON.stringify(order) }, function (res) {
+            $.post("includes/update_project_order.php", { order: JSON.stringify(order) }, function (res) {
                 console.log("Order updated");
             });
         }
     });
 });
+
 </script>
 
 <style>
@@ -100,7 +101,8 @@ $(function () {
                     <tr>
                         <th class="sticky-col">PROJECTS</th>
                         <?php foreach (['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'] as $day): ?>
-                            <th colspan="3"><?= $day ?></th>
+                            <th class="clickable-day" colspan="3" data-day="<?= strtolower($day) ?>"><?= $day ?></th>
+
                         <?php endforeach; ?>
                     </tr>
                     <tr>
@@ -150,5 +152,7 @@ $(function () {
         <?php include 'templates/workload_table.php'; ?>
     </div>
 </div>
-
+<script>
+    console.log("🔴 HARD TEST: I’m inside view.php");
+</script>
 <?php require_once 'templates/footer.php'; ?>

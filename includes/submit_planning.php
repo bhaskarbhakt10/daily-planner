@@ -27,18 +27,18 @@ foreach ($data['workload'] as &$person) {
 
 
 // 2. Update workload based on planning tasks
-foreach ($data['planning'] as $project) {
-    foreach ($project['tasks'] as $task) {
-        $assigneeId = $task['assigned_to']; // user_id now
-        $hours = floatval($task['hours']);
+// foreach ($data['planning'] as $project) {
+//     foreach ($project['tasks'] as $task) {
+//         $assigneeId = $task['assigned_to']; // user_id now
+//         $hours = floatval($task['hours']);
 
-        if (isset($workloadMap[$assigneeId])) {
-            $workloadMap[$assigneeId]['allocated'] += $hours;
-            $workloadMap[$assigneeId]['left'] -= $hours;
-            $workloadMap[$assigneeId]['Task'] += 1;
-        }
-    }
-}
+//         if (isset($workloadMap[$assigneeId])) {
+//             $workloadMap[$assigneeId]['allocated'] += $hours;
+//             $workloadMap[$assigneeId]['left'] -= $hours;
+//             $workloadMap[$assigneeId]['Task'] += 1;
+//         }
+//     }
+// }
 
 
 // 3. Insert into DB

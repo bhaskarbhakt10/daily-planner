@@ -20,8 +20,9 @@ $workload = [];
 
 $userResult = $conn->query("SELECT id, firstname FROM users WHERE is_active = '1' AND id NOT IN (1,27,38)");
 while ($row = $userResult->fetch_assoc()) {
-    $users[] = ['id' => $row['id'], 'name' => $row['firstname']];
-    $workload[$row['firstname']] = ['allocated' => 0, 'tasks' => 0];
+    $users[$row['id']] = $row['firstname'];
+    $workload[$row['id']] = ['allocated' => 0, 'tasks' => 0];
+
 }
 
 // Get planning data
@@ -32,9 +33,11 @@ while ($row = $result->fetch_assoc()) {
     $entries = json_decode($row['data'], true)['planning'];
     foreach ($entries as $entry) {
         foreach ($entry['tasks'] as $task) {
-            $name = $task['assigned_to'];
-            $workload[$name]['allocated'] += floatval($task['hours']);
-            $workload[$name]['tasks'] += 1;
+           $userId = $task['assigned_to'];
+            if (isset($workload[$userId])) {
+                $workload[$userId]['allocated'] += floatval($task['hours']);
+                $workload[$userId]['tasks'] += 1;
+            }
         }
     }
 }
@@ -53,18 +56,18 @@ while ($row = $result->fetch_assoc()) {
             </tr>
         </thead>
         <tbody>
-            <?php foreach ($users as $user): 
-                $name = $user['name'];
-                $allocated = $workload[$name]['allocated'] ?? 0;
-                $tasks = $workload[$name]['tasks'] ?? 0;
-                ?>
-                <tr class="workload-row" data-user-id="<?= $user['id'] ?>" data-name="<?= strtoupper($name) ?>">
-                    <td><?= htmlspecialchars(strtoupper($name)) ?></td>
-                    <td style="background: lightgreen;"><?= $allocated ?></td>
-                    <td style="background: lightblue;"><?= 8 - $allocated ?></td>
-                    <td style="background: orange;"><?= $tasks ?></td>
-                </tr>
+            <?php foreach ($users as $userId => $name): 
+            $allocated = $workload[$userId]['allocated'] ?? 0;
+            $tasks = $workload[$userId]['tasks'] ?? 0;
+            ?>
+            <tr class="workload-row" data-user-id="<?= $userId ?>" data-name="<?= strtoupper((string)$userId) ?>">
+                <td><?= htmlspecialchars(strtoupper($name)) ?></td>
+                <td style="background: lightgreen;"><?= $allocated ?></td>
+                <td style="background: lightblue;"><?= 8 - $allocated ?></td>
+                <td style="background: orange;"><?= $tasks ?></td>
+            </tr>
             <?php endforeach; ?>
+
         </tbody>
     </table>
 </div>

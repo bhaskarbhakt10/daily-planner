@@ -17,7 +17,7 @@ function addMainRow() {
             </select>
         </td>
         <td>
-            <select name="assigned_to[]" class="searchable-dropdown">
+            <select name="assigned_to[][]" class="searchable-dropdown">
                 ${users.map(u => `<option value="${u.id}">${u.name}</option>`).join('')}
             </select>
             <button type="button" class="action-btn remove" style="margin-top: 4px;" onclick="removeSubRow(this)">Remove</button>
@@ -50,7 +50,7 @@ function addSubRow(button) {
             </select>
         </td>
         <td>
-            <select name="assigned_to[]" class="searchable-dropdown">
+            <select name="assigned_to[][]" class="searchable-dropdown">
                 ${users.map(u => `<option value="${u.id}">${u.name}</option>`).join('')}
             </select>
             <button type="button" class="action-btn remove" style="margin-top: 4px;" onclick="removeSubRow(this)">Remove</button>
@@ -146,11 +146,11 @@ function removeSubRow(button) {
         // Copy actual values from inputs/selects
         const taskInput = secondRow.querySelector('input[name="task_description[]"]');
         const hoursSelect = secondRow.querySelector('select[name="hours[]"]');
-        const assignedSelect = secondRow.querySelector('select[name="assigned_to[]"]');
+        const assignedSelect = secondRow.querySelector('select[name="assigned_to[][]"]');
 
         const taskInputMain = row.querySelector('input[name="task_description[]"]');
         const hoursSelectMain = row.querySelector('select[name="hours[]"]');
-        const assignedSelectMain = row.querySelector('select[name="assigned_to[]"]');
+        const assignedSelectMain = row.querySelector('select[name="assigned_to[][]"]');
 
         if (taskInput && hoursSelect && assignedSelect) {
             taskInputMain.value = taskInput.value;
@@ -237,8 +237,22 @@ function submitData() {
     rows.forEach(row => {
         const taskInput = row.querySelector('input[name="task_description[]"]');
         const hoursSelect = row.querySelector('select[name="hours[]"]');
-        const assignedSelect = row.querySelector('select[name="assigned_to[]"]');
-        const assignedTo = assignedSelect ? assignedSelect.value : null;
+        const assignedSelect = row.querySelector('select[name="assigned_to[][]"]');
+        const assignedTo = assignedSelect ? $(assignedSelect).val() : null;
+
+        // Handle both single and multiple selections
+        // if (!Array.isArray(assignedTo)) {
+        //     assignedTo = assignedTo ? [assignedTo] : [];
+        // }
+
+        // assignedTo.forEach(id => {
+        //     tasks.push({
+        //         task_description: taskInput.value.trim(),
+        //         assigned_to: parseInt(id),
+        //         hours: parseFloat(hoursSelect.value)
+        //     });
+        // });
+
 
         if (taskInput && taskInput.value.trim() !== '' && hoursSelect && assignedTo) {
             tasks.push({
@@ -315,57 +329,64 @@ $(document).ready(function () {
         const workload = {};
 
         // Iterate each task row to calculate workload
-        $('.project-group tbody tr').each(function () {
+        
+    $('.project-group').each(function () {
+        $(this).find('tr').each(function () {
             const $row = $(this);
             const hours = parseFloat($row.find('select[name="hours[]"]').val()) || 0;
 
             $row.find('select[name="assigned_to[][]"]').each(function () {
-                const selectedUsers = $(this).val(); // array of user IDs
+                let selectedUsers = $(this).val();
                 if (!selectedUsers) return;
 
+                // Force to array in case single select
+                if (!Array.isArray(selectedUsers)) {
+                    selectedUsers = [selectedUsers];
+                }
+
                 selectedUsers.forEach(userId => {
-                    const username = userId.toString().toUpperCase(); // normalize key
-                    if (!workload[username]) {
-                        workload[username] = { allocated: 0, tasks: 0 };
+                    const key = userId.toString().toUpperCase();
+
+                    if (!workload[key]) {
+                        workload[key] = { allocated: 0, tasks: 0 };
                     }
 
-                    workload[username].allocated += hours;
-                    workload[username].tasks += 1;
+                    workload[key].allocated += hours;
+                    workload[key].tasks += 1;
                 });
             });
         });
+    });
 
         const updatedWorkload = [];
 
         // Update DOM table and collect data
         $('.workload-row').each(function () {
-            const $row = $(this);
-            const name = $row.data('name'); // uppercase name
-            const userId = parseInt($row.data('user-id')); // numeric ID
-            const data = workload[name];
+        const $row = $(this);
+        const key = $row.data('name'); // This should now be user ID uppercased
+        const userId = parseInt($row.data('user-id'));
+        const data = workload[key];
 
-            const allocated = data ? data.allocated : 0;
-            const left = 8 - allocated;
-            const tasks = data ? data.tasks : 0;
+        const allocated = data ? data.allocated : 0;
+        const left = 8 - allocated;
+        const tasks = data ? data.tasks : 0;
 
-            // Update table cells
-            $row.find('td').eq(1).text(allocated);
-            $row.find('td').eq(2).text(left);
-            $row.find('td').eq(3).text(tasks);
+        $row.find('td').eq(1).text(allocated); // Allocated
+        $row.find('td').eq(2).text(left);      // Left
+        $row.find('td').eq(3).text(tasks);     // Tasks
 
-            // Save updated data to row
-            const rowData = {
-                'user-id': userId,
-                allocated,
-                left,
-                Task: tasks
-            };
-            $row.data('workload-updated', rowData);
-            updatedWorkload.push(rowData);
-        });
+        const rowData = {
+            'user-id': userId,
+            allocated,
+            left,
+            Task: tasks
+        };
+        $row.data('workload-updated', rowData);
+        updatedWorkload.push(rowData);
+    });
 
-        return updatedWorkload;
-    }
+    return updatedWorkload;
+}
 
     // Bind to form/input changes
     $(document).on('input change', '#taskTable select, #taskTable input', updateWorkloadTable);
@@ -404,28 +425,22 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 
-$(function () {
-  $(".week-planner").sortable({
-    items: "tbody.sortable-project",
-    update: function (event, ui) {
-      let newOrder = [];
-      $(".sortable-project").each(function (index) {
-        newOrder.push({
-          project_id: $(this).data("project-id"),
-          position: index + 1
-        });
-      });
 
-      $.ajax({
-        url: 'includes/update_project_order.php',
-        method: 'POST',
-        data: { order: JSON.stringify(newOrder) },
-        contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
-        success: function (response) {
-            console.log("Updated successfully");
-        }
-        });
-
-    }
-  });
-});
+// $(function () {
+//     $(".week-planner").sortable({
+//         items: "tbody.sortable-project",
+//         handle: ".project-drag-handle",
+//         update: function () {
+//             let order = [];
+//             $(".sortable-project").each(function (i) {
+//                 order.push({
+//                     project_id: $(this).data("project-id"),
+//                     position: i + 1
+//                 });
+//             });
+//             $.post("includes/update_project_order.php", { order: JSON.stringify(order) }, function (res) {
+//                 console.log("Order updated");
+//             });
+//         }
+//     });
+// });

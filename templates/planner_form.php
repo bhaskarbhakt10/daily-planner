@@ -29,7 +29,7 @@
                     </select>
                 </td>
                 <td>
-                <select name="assigned_to[]" class="searchable-dropdown">
+                <select name="assigned_to[][]" class="searchable-dropdown">
                     <?php foreach ($users as $user): ?>
                         <option value="<?= $user['id'] ?>"><?= htmlspecialchars($user['name']) ?></option>
                     <?php endforeach; ?>
