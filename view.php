@@ -51,18 +51,14 @@ if (!empty($projects)) {
     }
 }
 
-// Fetch users
-// $users = [];
-// $result = $conn->query("SELECT id, firstname FROM users WHERE is_active = '1' AND id NOT IN (1, 27, 38)");
-// while ($row = $result->fetch_assoc()) {
-//     $users[$row['id']] = $row['firstname'];
-// }
+// Fetch users (and create user ID => name map)
 $users = [];
+$userNameMap = [];
 $result = $conn->query("SELECT id, firstname FROM users WHERE is_active = '1' AND id NOT IN (1, 27, 38)");
 while ($row = $result->fetch_assoc()) {
     $users[] = ['id' => $row['id'], 'name' => $row['firstname']];
+    $userNameMap[$row['id']] = $row['firstname'];
 }
-
 ?>
 
 <!-- Include jQuery and jQuery UI -->
@@ -87,7 +83,6 @@ $(function () {
         }
     });
 });
-
 </script>
 
 <style>
@@ -96,6 +91,12 @@ $(function () {
     display: inline-block;
     margin-right: 5px;
     color: #999;
+}
+.edit-button {
+    font-size: 14px;
+    margin-left: 6px;
+    color: #fff;
+    text-decoration: none;
 }
 </style>
 
@@ -106,9 +107,15 @@ $(function () {
                 <thead>
                     <tr>
                         <th class="sticky-col">PROJECTS</th>
-                        <?php foreach (['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'] as $day): ?>
-                            <th class="clickable-day" colspan="3" data-day="<?= strtolower($day) ?>"><?= $day ?></th>
-
+                        <?php
+                        $weekdays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+                        foreach ($weekdays as $index => $day):
+                            $dateForThisDay = (new DateTime('Monday this week'))->modify("+$index days")->format('Y-m-d');
+                        ?>
+                            <th class="clickable-day" colspan="3" data-day="<?= strtolower($day) ?>">
+                                <?= $day ?>
+                                <a href="index.php?edit_date=<?= $dateForThisDay ?>" class="edit-button" title="Edit Plan">✏️</a>
+                            </th>
                         <?php endforeach; ?>
                     </tr>
                     <tr>
@@ -141,10 +148,11 @@ $(function () {
                             <?php foreach ($days as $day): ?>
                                 <?php
                                 $task = $weekData[$day][$project][$i] ?? ['task' => '', 'hours' => '', 'user' => ''];
+                                $assignedName = $userNameMap[$task['user']] ?? '';
                                 ?>
                                 <td><input type="text" name="task_description[<?= $project ?>][<?= $day ?>][]" value="<?= htmlspecialchars($task['task']) ?>" /></td>
                                 <td><input type="text" name="hours[<?= $project ?>][<?= $day ?>][]" value="<?= htmlspecialchars($task['hours']) ?>" /></td>
-                                <td><input type="text" name="assigned_to[<?= $project ?>][<?= $day ?>][]" value="<?= htmlspecialchars($users[$task['user']] ?? '') ?>" /></td>
+                                <td><input type="text" name="assigned_to[<?= $project ?>][<?= $day ?>][]" value="<?= htmlspecialchars($assignedName) ?>" /></td>
                             <?php endforeach; ?>
                         </tr>
                     <?php endfor; ?>
@@ -158,7 +166,9 @@ $(function () {
         <?php include 'templates/workload_table.php'; ?>
     </div>
 </div>
+
 <script>
     console.log("🔴 HARD TEST: I’m inside view.php");
 </script>
+
 <?php require_once 'templates/footer.php'; ?>

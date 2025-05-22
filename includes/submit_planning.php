@@ -43,7 +43,7 @@ foreach ($data['planning'] as $project) {
 }
 
 
-// 3. Insert into DB
+// 3. Insert or update DB
 $finalJson = json_encode([
     'planning' => $data['planning'],
     'workload' => array_values($workloadMap)
@@ -58,7 +58,6 @@ if (!$parsed || $parsed->format('Y-m-d') !== $date) {
     exit;
 }
 
-
 if (!$date) {
     file_put_contents('debug.log', "Date is null or missing: " . print_r($data, true));
     http_response_code(400);
@@ -66,9 +65,21 @@ if (!$date) {
     exit;
 }
 
+// ✅ Check if a record exists for that date
+$stmtCheck = $conn->prepare("SELECT id FROM daily_planning_data WHERE plan_date = ?");
+$stmtCheck->bind_param("s", $date);
+$stmtCheck->execute();
+$result = $stmtCheck->get_result();
 
-$stmt = $conn->prepare("INSERT INTO daily_planning_data (data, plan_date) VALUES (?, ?)");
-$stmt->bind_param("ss", $finalJson, $date);
+if ($result && $result->num_rows > 0) {
+    // ✅ UPDATE existing
+    $stmt = $conn->prepare("UPDATE daily_planning_data SET data = ? WHERE plan_date = ?");
+    $stmt->bind_param("ss", $finalJson, $date);
+} else {
+    // ✅ INSERT new
+    $stmt = $conn->prepare("INSERT INTO daily_planning_data (data, plan_date) VALUES (?, ?)");
+    $stmt->bind_param("ss", $finalJson, $date);
+}
 
 
 if ($stmt->execute()) {

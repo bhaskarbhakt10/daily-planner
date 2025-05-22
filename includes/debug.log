@@ -1,3 +1,1 @@
-Array
-(
-)
+Raw input: {"date":"2025-05-23","planning":[{"project_id":"NUIT_POJ1","position":1,"tasks":[{"task_description":"test 1","assigned_to":32,"hours":4}]},{"project_id":"NUIT_POJ2","position":2,"tasks":[{"task_description":"test 1","assigned_to":34,"hours":1}]}],"workload":[{"user-id":21,"allocated":0,"left":8,"Task":0},{"user-id":25,"allocated":0,"left":8,"Task":0},{"user-id":30,"allocated":0,"left":8,"Task":0},{"user-id":32,"allocated":4,"left":4,"Task":1},{"user-id":34,"allocated":1,"left":7,"Task":1},{"user-id":35,"allocated":0,"left":8,"Task":0},{"user-id":37,"allocated":0,"left":8,"Task":0},{"user-id":39,"allocated":0,"left":8,"Task":0},{"user-id":40,"allocated":0,"left":8,"Task":0},{"user-id":42,"allocated":0,"left":8,"Task":0},{"user-id":44,"allocated":0,"left":8,"Task":0}]}
