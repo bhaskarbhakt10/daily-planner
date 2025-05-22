@@ -1,14 +1,16 @@
 <?php
 require '../config/db.php';
 
-file_put_contents('debug.log', print_r($_POST, true));
+// file_put_contents('debug.log', print_r($_POST, true));
+file_put_contents('debug.log', "Raw input: " . file_get_contents("php://input"));
 
+header('Content-Type: application/json');
+ini_set('display_errors', 0);
+error_reporting(E_ERROR | E_PARSE);
 
 $data = json_decode(file_get_contents("php://input"), true);
 
-header('Content-Type: application/json'); // always return JSON
-error_reporting(E_ERROR); // suppress warnings/notices
-ini_set('display_errors', 0);
+
 
 
 // echo json_encode(['status' => 'success', 'updatedWorkload' => $updatedData]);
@@ -27,18 +29,18 @@ foreach ($data['workload'] as &$person) {
 
 
 // 2. Update workload based on planning tasks
-// foreach ($data['planning'] as $project) {
-//     foreach ($project['tasks'] as $task) {
-//         $assigneeId = $task['assigned_to']; // user_id now
-//         $hours = floatval($task['hours']);
+foreach ($data['planning'] as $project) {
+    foreach ($project['tasks'] as $task) {
+        $assigneeId = $task['assigned_to']; // user_id now
+        $hours = floatval($task['hours']);
 
-//         if (isset($workloadMap[$assigneeId])) {
-//             $workloadMap[$assigneeId]['allocated'] += $hours;
-//             $workloadMap[$assigneeId]['left'] -= $hours;
-//             $workloadMap[$assigneeId]['Task'] += 1;
-//         }
-//     }
-// }
+        if (isset($workloadMap[$assigneeId])) {
+            $workloadMap[$assigneeId]['allocated'] += $hours;
+            $workloadMap[$assigneeId]['left'] -= $hours;
+            $workloadMap[$assigneeId]['Task'] += 1;
+        }
+    }
+}
 
 
 // 3. Insert into DB
@@ -47,13 +49,23 @@ $finalJson = json_encode([
     'workload' => array_values($workloadMap)
 ]);
 
-$date = isset($data['date']) ? $data['date'] : null;
+$date = $data['date'] ?? null;
+
+$parsed = DateTime::createFromFormat('Y-m-d', $date);
+if (!$parsed || $parsed->format('Y-m-d') !== $date) {
+    http_response_code(400);
+    echo json_encode(['status' => 'error', 'message' => 'Invalid date format.']);
+    exit;
+}
+
 
 if (!$date) {
+    file_put_contents('debug.log', "Date is null or missing: " . print_r($data, true));
     http_response_code(400);
     echo json_encode(['status' => 'error', 'message' => 'Date is missing.']);
     exit;
 }
+
 
 $stmt = $conn->prepare("INSERT INTO daily_planning_data (data, plan_date) VALUES (?, ?)");
 $stmt->bind_param("ss", $finalJson, $date);

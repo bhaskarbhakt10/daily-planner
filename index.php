@@ -30,16 +30,51 @@ while ($row = $result->fetch_assoc()) {
     ];
 }
 ?>
+<script src="https://code.jquery.com/jquery-3.7.1.js"></script>
+<script src="https://code.jquery.com/ui/1.14.1/jquery-ui.js"></script>
+<script>
+    $(function () {
+    $("#taskTable").sortable({
+        items: ".project-group",
+        handle: ".project-drag-handle",
+        axis: "y",
+        containment: "parent",
+        tolerance: "pointer",
+        placeholder: "sortable-placeholder",
+        update: function () {
+        console.log("Projects reordered (create mode)");
+        }
+    });
+});
+
+</script>
+
+<style>
+.project-drag-handle {
+  cursor: move;
+  margin-right: 6px;
+  color: #888;
+  font-size: 18px;
+  display: inline-block;
+}
+
+.sortable-placeholder {
+  background-color: #f0f0f0;
+  border: 2px dashed #ccc;
+  height: 50px;
+}
+</style>
+
 
 
 <form method="GET" style="margin: 20px;">
     <label for="selected_date">Select Date:</label>
     <input 
-        type="date" 
+        type="text" 
         id="selected_date" 
         name="selected_date" 
         value="<?php echo isset($_GET['selected_date']) ? $_GET['selected_date'] : date('Y-m-d'); ?>" 
-        onchange="this.form.submit()"
+        
     >
 </form>
 <input type="hidden" id="hidden_date" value="<?php echo $_GET['selected_date'] ?? date('Y-m-d'); ?>">
