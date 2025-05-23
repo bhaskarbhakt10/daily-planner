@@ -442,21 +442,48 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 });
 
-// $(function () {
-//     $(".week-planner").sortable({
-//         items: "tbody.sortable-project",
-//         handle: ".project-drag-handle",
-//         update: function () {
-//             let order = [];
-//             $(".sortable-project").each(function (i) {
-//                 order.push({
-//                     project_id: $(this).data("project-id"),
-//                     position: i + 1
-//                 });
-//             });
-//             $.post("includes/update_project_order.php", { order: JSON.stringify(order) }, function (res) {
-//                 console.log("Order updated");
-//             });
-//         }
-//     });
-// });
+$(document).ready(function () {
+    const days = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+    const todayIndex = new Date().getDay(); // 0 = Sunday, 1 = Monday, ...
+    const todayDay = days[todayIndex];
+
+    // Highlight today's header column
+    const $todayHeader = $(`th[data-day="${todayDay}"]`);
+    if ($todayHeader.length) {
+        $todayHeader.css({
+            backgroundColor: '#003300', 
+            fontWeight: 'bold'
+        });
+    }
+
+    // Scroll to the column (if horizontal scroll is enabled)
+    $('.container2').scrollLeft($todayHeader.position().left);
+});
+
+$(function () {
+    $(".week-planner tbody").sortable({
+        items: "tr.project-separator", // Only move the first row of each group
+        handle: ".project-drag-handle",
+        helper: function (e, row) {
+            row.children().each(function () {
+                $(this).width($(this).width());
+            });
+            return row.clone();
+        },
+        update: function () {
+            let order = [];
+            $(".project-separator").each(function (i) {
+                const $tbody = $(this).closest('tbody.sortable-project');
+                const projectId = $tbody.data("project-id");
+                order.push({
+                    project_id: projectId,
+                    position: i + 1
+                });
+            });
+
+            $.post("includes/update_project_order.php", { order: JSON.stringify(order) }, function (res) {
+                console.log("Order updated");
+            });
+        }
+    });
+});

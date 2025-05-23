@@ -162,7 +162,7 @@ button[type="button"]:not(.action-btn):hover {
   position: sticky;
   left: 0;
   background: #fff;
-  z-index: 1;
+  z-index: 3; /* not 99999 — jQuery UI will handle during drag */
   min-width: 180px;
   max-width: 180px;
 }
@@ -170,7 +170,7 @@ button[type="button"]:not(.action-btn):hover {
 thead .sticky-col {
   background: rgb(16, 57, 129);
   color: #fff;
-  z-index: 2;
+  z-index: 4;
 }
 
 .right-panel2 {
@@ -206,5 +206,17 @@ body {
     color: #fff;
     text-decoration: none;
     vertical-align: middle;
+}
+
+/* Style for the row being dragged */
+.week-planner .ui-sortable-helper {
+    z-index: 99999 !important;
+    background: #fdfdfd;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Smooth transition for rows shifting */
+.week-planner tbody.sortable-project {
+    transition: all 0.2s ease-in-out;
 }
 
