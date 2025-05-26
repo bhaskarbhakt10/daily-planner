@@ -7,6 +7,7 @@ $planningData = $existingData['planning'] ?? [];
         <thead>
             <tr>
                 <th>Project Name</th>
+                <th>Priority</th>
                 <th>Task Description</th>
                 <th>No. of Hours</th>
                 <th>Assigned To</th>
@@ -15,7 +16,6 @@ $planningData = $existingData['planning'] ?? [];
         </thead>
 
         <?php if (!empty($planningData)): ?>
-            <!-- Render existing planning data (edit mode) -->
             <?php foreach ($planningData as $project): ?>
                 <tbody class="project-group">
                     <?php foreach ($project['tasks'] as $i => $task): ?>
@@ -30,6 +30,10 @@ $planningData = $existingData['planning'] ?? [];
                                             </option>
                                         <?php endforeach; ?>
                                     </select>
+                                </td>
+
+                                <td rowspan="<?= count($project['tasks']) ?>">
+                                    <input type="checkbox" name="client_priority[]" value="1" <?= !empty($project['client_priority']) ? 'checked' : '' ?> />
                                 </td>
                             <?php endif; ?>
 
@@ -65,7 +69,6 @@ $planningData = $existingData['planning'] ?? [];
                 </tbody>
             <?php endforeach; ?>
         <?php else: ?>
-            <!-- Default empty row (create mode) -->
             <tbody class="project-group">
                 <tr>
                     <td rowspan="1" class="project-cell">
@@ -75,6 +78,10 @@ $planningData = $existingData['planning'] ?? [];
                                 <option value="<?= $project['id'] ?>"><?= htmlspecialchars($project['name']) ?></option>
                             <?php endforeach; ?>
                         </select>
+                    </td>
+
+                    <td rowspan="1">
+                        <input type="checkbox" name="client_priority[]" value="1" />
                     </td>
 
                     <td><input type="text" name="task_description[]" /></td>

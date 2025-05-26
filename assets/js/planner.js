@@ -13,6 +13,9 @@ function addMainRow() {
                   .join("")}
             </select>
         </td>
+        <td rowspan="1">
+            <input type="checkbox" name="client_priority[]" value="1" />
+        </td>
         <td><input type="text" name="task_description[]" /></td>
         <td>
             <select name="hours[]">
@@ -38,9 +41,10 @@ function addMainRow() {
   tbody.appendChild(row);
   table.appendChild(tbody);
 
-  // Wait for the DOM to update and reinitialize Select2 or other dropdown logic
+  // Wait for the DOM to update and reinitialize dropdown plugins
   setTimeout(refreshSelect2, 50);
 }
+
 
 function addSubRow(button) {
   const row = button.closest("tr");
@@ -50,30 +54,41 @@ function addSubRow(button) {
   const currentRowspan = parseInt(projectCell.getAttribute("rowspan"));
   projectCell.setAttribute("rowspan", currentRowspan + 1);
 
+  const priorityCell = tbody.querySelector('td[rowspan].priority-cell');
+  if (priorityCell) {
+    const priorityRowspan = parseInt(priorityCell.getAttribute("rowspan"));
+    priorityCell.setAttribute("rowspan", priorityRowspan + 1);
+  }
+
   const newRow = document.createElement("tr");
   newRow.innerHTML = `
+        <!-- Placeholder for Priority column (empty cell) -->
+        <td></td>
+
         <td><input type="text" name="task_description[]" /></td>
+
         <td>
             <select name="hours[]">
-                ${hours
-                  .map((h) => `<option value="${h}">${h}</option>`)
-                  .join("")}
+                ${hours.map(h => `<option value="${h}">${h}</option>`).join("")}
             </select>
         </td>
+
         <td>
             <select name="assigned_to[][]" class="searchable-dropdown">
-                ${users
-                  .map((u) => `<option value="${u.id}">${u.name}</option>`)
-                  .join("")}
+                ${users.map(u => `<option value="${u.id}">${u.name}</option>`).join("")}
             </select>
-            <button type="button" class="action-btn remove" style="margin-top: 4px;" onclick="removeSubRow(this)">Remove</button>
+            <button type="button" class="action-btn remove" onclick="removeSubRow(this)">Remove</button>
         </td>
-        <td></td>
+
+        <td></td> <!-- Action column still renders in main row -->
     `;
 
   tbody.appendChild(newRow);
   setTimeout(refreshSelect2, 50);
 }
+
+
+
 
 // function refreshSelect2() {
 //     $('.searchable-dropdown').each(function () {
@@ -209,18 +224,17 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 $(function () {
-  //Datepicker
-  //   const today = new Date().toISOString().split('T')[0];
-  //   $("#selected_date").datepicker({
-  //       dateFormat: "yy-mm-dd",
-  //       defaultDate: today,
-  //       onSelect: function (dateText) {
-  //           $("#hidden_date").val(dateText);
+  $("#selected_date").datepicker({
+    dateFormat: 'yy-mm-dd',
+    minDate: 0
+  });
 
-  //       }
-  //   }).datepicker("setDate", today);
-  $("#selected_date").datepicker();
+  const initialDate = $("#selected_date").val();
+  if (initialDate) {
+    $("#selected_date").datepicker("setDate", initialDate);
+  }
 });
+
 
 function submitData() {
   const planning = [];
@@ -241,16 +255,16 @@ function submitData() {
     return;
   }
 
-  // Loop over each project group (each tbody)
+  // Loop over each project group
   document.querySelectorAll(".project-group").forEach((group, groupIndex) => {
-    // console.log(`Project group ${groupIndex + 1} found`);
-
     const rows = group.querySelectorAll("tr");
-    // console.log(`Rows in project group ${groupIndex + 1}:`, rows.length);
 
     const projectSelect = group.querySelector('select[name="project[]"]');
-    const projectId = projectSelect ? projectSelect.value : null; // DO NOT use select2 span
+    const projectId = projectSelect ? projectSelect.value : null;
     if (!projectId) return;
+
+    const priorityCheckbox = group.querySelector('input[name="client_priority[]"]');
+    const clientPriority = priorityCheckbox && priorityCheckbox.checked ? 1 : 0;
 
     const tasks = [];
 
@@ -259,12 +273,6 @@ function submitData() {
       const hoursSelect = row.querySelector('select[name^="hours"]');
       const assignedSelect = row.querySelector('select[name^="assigned_to"]');
       const assignedTo = assignedSelect ? $(assignedSelect).val() : null;
-
-//       console.log("🔎 Row:", {
-//   taskInput: taskInput?.value,
-//   hours: hoursSelect?.value,
-//   assignedTo: assignedSelect ? $(assignedSelect).val() : null
-// });
 
       if (
         taskInput &&
@@ -284,14 +292,13 @@ function submitData() {
       planning.push({
         project_id: projectId,
         position: groupIndex + 1,
+        client_priority: clientPriority,
         tasks: tasks,
       });
     }
-
-
   });
 
-  // ✅ Build workload array from .workload-table (make sure your table includes this!)
+  // Optional workload table logic
   document.querySelectorAll(".workload-table tbody tr").forEach((row) => {
     const userIdAttr = row.getAttribute("data-user-id");
     const cells = row.querySelectorAll("td");
@@ -311,10 +318,7 @@ function submitData() {
     workload: workload,
   };
 
-  console.log(
-    "📦 Final JSON data being sent:",
-    JSON.stringify(jsonData, null, 2)
-  );
+  console.log("Final JSON data being sent:", JSON.stringify(jsonData, null, 2));
 
   fetch("includes/submit_planning.php", {
     method: "POST",
@@ -323,8 +327,7 @@ function submitData() {
   })
     .then((response) => response.text())
     .then((text) => {
-      //   console.log("Raw server response:", text); // 👈 Add this
-      const data = JSON.parse(text); // This will throw if the response is invalid
+      const data = JSON.parse(text);
       if (data.status === "success") {
         alert("Data submitted successfully!");
       } else {
@@ -336,6 +339,7 @@ function submitData() {
       alert("Submission failed. See console for details.");
     });
 }
+
 
 $(document).ready(function () {
   function updateWorkloadTable() {
@@ -423,25 +427,6 @@ $(document).ready(function () {
   window.getUpdatedWorkload = updateWorkloadTable;
 });
 
-document.addEventListener("DOMContentLoaded", function () {
-  console.log("Script loaded");
-
-  document.querySelectorAll(".clickable-day").forEach(function (header) {
-    console.log("Attaching click to:", header);
-    header.addEventListener("click", function () {
-      const day = this.getAttribute("data-day");
-      console.log("Clicked day:", day);
-
-      fetch("includes/fetch_workload.php?day=" + day)
-        .then((res) => res.text())
-        .then((html) => {
-          document.querySelector(".right-panel2").innerHTML = html;
-        })
-        .catch((err) => console.error("Error loading workload:", err));
-    });
-  });
-});
-
 $(document).ready(function () {
     const days = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
     const todayIndex = new Date().getDay(); // 0 = Sunday, 1 = Monday, ...
@@ -451,39 +436,81 @@ $(document).ready(function () {
     const $todayHeader = $(`th[data-day="${todayDay}"]`);
     if ($todayHeader.length) {
         $todayHeader.css({
-            backgroundColor: '#003300', 
+            backgroundColor: '#003300',
             fontWeight: 'bold'
         });
+
+        // Scroll to the column (if horizontal scroll is enabled)
+        $('.container2').scrollLeft($todayHeader.position().left);
     }
 
-    // Scroll to the column (if horizontal scroll is enabled)
-    $('.container2').scrollLeft($todayHeader.position().left);
+    // Auto-fetch workload for current day
+    fetch("includes/fetch_workload.php?day=" + todayDay)
+        .then((res) => res.text())
+        .then((html) => {
+            document.querySelector(".right-panel2").innerHTML = html;
+        })
+        .catch((err) => console.error("Error loading workload:", err));
+});
+
+// Event binding for clicking on weekday headers
+document.addEventListener("DOMContentLoaded", function () {
+    document.querySelectorAll(".clickable-day").forEach(function (header) {
+        header.addEventListener("click", function () {
+            const day = this.getAttribute("data-day");
+
+            fetch("includes/fetch_workload.php?day=" + day)
+                .then((res) => res.text())
+                .then((html) => {
+                    document.querySelector(".right-panel2").innerHTML = html;
+                })
+                .catch((err) => console.error("Error loading workload:", err));
+        });
+    });
 });
 
 $(function () {
-    $(".week-planner tbody").sortable({
-        items: "tr.project-separator", // Only move the first row of each group
+    let groupedRows = [];
+
+    $("#sortable").sortable({
+        items: ".sortable-project",
         handle: ".project-drag-handle",
-        helper: function (e, row) {
-            row.children().each(function () {
-                $(this).width($(this).width());
-            });
-            return row.clone();
+        helper: function (e, tr) {
+            const projectId = tr.data("project-id");
+            groupedRows = $(`tr[data-project-id='${projectId}']`);
+
+            const helper = $("<table/>").append(groupedRows.clone());
+            helper.css("background", "#f0f0f0");
+            return helper;
         },
-        update: function () {
+        start: function (e, ui) {
+            const rowCount = groupedRows.length;
+            ui.placeholder.height(rowCount * ui.item.height());
+        },
+        stop: function (e, ui) {
+            const projectId = ui.item.data("project-id");
+            const newIndex = $(".sortable-project").index(ui.item);
+            const tbody = $("#sortable");
+
+            groupedRows.detach();
+
+            if (newIndex === 0) {
+                tbody.prepend(groupedRows);
+            } else {
+                const target = $(".sortable-project").eq(newIndex - 1);
+                const lastRow = $(`tr[data-project-id='${target.data("project-id")}']`).last();
+                groupedRows.insertAfter(lastRow);
+            }
+            // Save order to DB
             let order = [];
-            $(".project-separator").each(function (i) {
-                const $tbody = $(this).closest('tbody.sortable-project');
-                const projectId = $tbody.data("project-id");
-                order.push({
-                    project_id: projectId,
-                    position: i + 1
-                });
+            $(".sortable-project").each(function (i) {
+                const pid = $(this).data("project-id");
+                order.push({ project_id: pid, position: i + 1 });
             });
 
             $.post("includes/update_project_order.php", { order: JSON.stringify(order) }, function (res) {
                 console.log("Order updated");
             });
         }
-    });
+    }).disableSelection();
 });

@@ -4,7 +4,12 @@ $projects = [];
 $users = [];
 $hours = ["0.5", "1", "1.5", "2", "2.5", "3", "3.5", "4", "5", "6", "7", "8"];
 
-$selectedDate = $_GET['edit_date'] ?? ($_GET['selected_date'] ?? date('Y-m-d'));
+// $selectedDate = $_GET['edit_date'] ?? $_GET['selected_date'] ?? date('Y-m-d');
+$editDate = $_GET['edit_date'] ?? null;
+$selectedDate = $editDate ?? ($_GET['selected_date'] ?? date('Y-m-d'));
+$editMode = isset($editDate);
+
+
 
 
 $result = $conn->query("SELECT Project_Id, Project_Name FROM projects");
@@ -23,11 +28,11 @@ while ($row = $result->fetch_assoc()) {
     ];
 }
 
-$editMode = false;
-$editDate = $_GET['edit_date'] ?? null;
+// $editMode = false;
+// $editDate = $_GET['edit_date'] ?? null;
 
-if ($editDate) {
-    $editMode = true;
+if ($editMode) {
+    $editDate = $selectedDate;
 
     // Fetch the existing record for that date
     $stmt = $conn->prepare("SELECT data FROM daily_planning_data WHERE plan_date = ?");
@@ -41,6 +46,7 @@ if ($editDate) {
         $existingData = json_decode($row['data'], true);
     }
 }
+
 
 ?>
 <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
@@ -62,7 +68,7 @@ if ($editDate) {
 
 </script>
 
-<style>
+<!-- <style>
 .project-drag-handle {
   cursor: move;
   margin-right: 6px;
@@ -76,8 +82,7 @@ if ($editDate) {
   border: 2px dashed #ccc;
   height: 50px;
 }
-</style>
-
+</style> -->
 
 
     <form method="GET" style="margin: 20px;">
@@ -86,11 +91,23 @@ if ($editDate) {
             type="text" 
             id="selected_date" 
             name="selected_date" 
-            value="<?php echo isset($_GET['selected_date']) ? $_GET['selected_date'] : date('Y-m-d'); ?>" 
-            
+            value="<?= htmlspecialchars($selectedDate) ?>" 
+            readonly
         >
+
     </form>
-    <input type="hidden" id="hidden_date" value="<?php echo $_GET['selected_date'] ?? date('Y-m-d'); ?>">
+    <input type="hidden" id="hidden_date" value="<?= htmlspecialchars($selectedDate) ?>">
+
+    <script>
+    $(function () {
+        const selectedDate = $('#hidden_date').val();
+        $("#selected_date").datepicker({
+            dateFormat: "yy-mm-dd"
+        }).datepicker("setDate", selectedDate);
+    });
+</script>
+
+
 
 <!-- <form method="GET" style="margin: 20px;">
     <label for="selected_date">Select Date:</label>

@@ -1,7 +1,7 @@
 <script>
   const projects = <?= json_encode($projects) ?>;
   const users = <?= json_encode($users) ?>;
-  const hours = <?= json_encode($hours) ?>;
+ 
 </script>
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>

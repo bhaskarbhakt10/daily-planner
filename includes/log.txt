@@ -1,0 +1,286 @@
+Array
+(
+    [date] => 2025-05-26
+    [planning] => Array
+        (
+            [0] => Array
+                (
+                    [project_id] => NUIT_POJ5
+                    [position] => 1
+                    [client_priority] => 1
+                    [tasks] => Array
+                        (
+                            [0] => Array
+                                (
+                                    [task_description] => test 1
+                                    [assigned_to] => 25
+                                    [hours] => 1
+                                )
+
+                            [1] => Array
+                                (
+                                    [task_description] => test 1
+                                    [assigned_to] => 34
+                                    [hours] => 2
+                                )
+
+                        )
+
+                )
+
+            [1] => Array
+                (
+                    [project_id] => NUIT_POJ23
+                    [position] => 2
+                    [client_priority] => 0
+                    [tasks] => Array
+                        (
+                            [0] => Array
+                                (
+                                    [task_description] => test1
+                                    [assigned_to] => 42
+                                    [hours] => 3
+                                )
+
+                        )
+
+                )
+
+        )
+
+    [workload] => Array
+        (
+            [0] => Array
+                (
+                    [user-id] => 21
+                    [allocated] => 0
+                    [left] => 8
+                    [Task] => 0
+                )
+
+            [1] => Array
+                (
+                    [user-id] => 25
+                    [allocated] => 1
+                    [left] => 7
+                    [Task] => 1
+                )
+
+            [2] => Array
+                (
+                    [user-id] => 30
+                    [allocated] => 0
+                    [left] => 8
+                    [Task] => 0
+                )
+
+            [3] => Array
+                (
+                    [user-id] => 32
+                    [allocated] => 0
+                    [left] => 8
+                    [Task] => 0
+                )
+
+            [4] => Array
+                (
+                    [user-id] => 34
+                    [allocated] => 2
+                    [left] => 6
+                    [Task] => 1
+                )
+
+            [5] => Array
+                (
+                    [user-id] => 35
+                    [allocated] => 0
+                    [left] => 8
+                    [Task] => 0
+                )
+
+            [6] => Array
+                (
+                    [user-id] => 37
+                    [allocated] => 0
+                    [left] => 8
+                    [Task] => 0
+                )
+
+            [7] => Array
+                (
+                    [user-id] => 39
+                    [allocated] => 0
+                    [left] => 8
+                    [Task] => 0
+                )
+
+            [8] => Array
+                (
+                    [user-id] => 40
+                    [allocated] => 0
+                    [left] => 8
+                    [Task] => 0
+                )
+
+            [9] => Array
+                (
+                    [user-id] => 42
+                    [allocated] => 3
+                    [left] => 5
+                    [Task] => 1
+                )
+
+            [10] => Array
+                (
+                    [user-id] => 44
+                    [allocated] => 0
+                    [left] => 8
+                    [Task] => 0
+                )
+
+        )
+
+)
+Array
+(
+    [date] => 2025-05-27
+    [planning] => Array
+        (
+            [0] => Array
+                (
+                    [project_id] => NUIT_POJ5
+                    [position] => 1
+                    [client_priority] => 1
+                    [tasks] => Array
+                        (
+                            [0] => Array
+                                (
+                                    [task_description] => test 1
+                                    [assigned_to] => 25
+                                    [hours] => 1
+                                )
+
+                            [1] => Array
+                                (
+                                    [task_description] => test 1
+                                    [assigned_to] => 34
+                                    [hours] => 2
+                                )
+
+                        )
+
+                )
+
+            [1] => Array
+                (
+                    [project_id] => NUIT_POJ23
+                    [position] => 2
+                    [client_priority] => 0
+                    [tasks] => Array
+                        (
+                            [0] => Array
+                                (
+                                    [task_description] => test1
+                                    [assigned_to] => 42
+                                    [hours] => 3
+                                )
+
+                        )
+
+                )
+
+        )
+
+    [workload] => Array
+        (
+            [0] => Array
+                (
+                    [user-id] => 21
+                    [allocated] => 0
+                    [left] => 8
+                    [Task] => 0
+                )
+
+            [1] => Array
+                (
+                    [user-id] => 25
+                    [allocated] => 1
+                    [left] => 7
+                    [Task] => 1
+                )
+
+            [2] => Array
+                (
+                    [user-id] => 30
+                    [allocated] => 0
+                    [left] => 8
+                    [Task] => 0
+                )
+
+            [3] => Array
+                (
+                    [user-id] => 32
+                    [allocated] => 0
+                    [left] => 8
+                    [Task] => 0
+                )
+
+            [4] => Array
+                (
+                    [user-id] => 34
+                    [allocated] => 2
+                    [left] => 6
+                    [Task] => 1
+                )
+
+            [5] => Array
+                (
+                    [user-id] => 35
+                    [allocated] => 0
+                    [left] => 8
+                    [Task] => 0
+                )
+
+            [6] => Array
+                (
+                    [user-id] => 37
+                    [allocated] => 0
+                    [left] => 8
+                    [Task] => 0
+                )
+
+            [7] => Array
+                (
+                    [user-id] => 39
+                    [allocated] => 0
+                    [left] => 8
+                    [Task] => 0
+                )
+
+            [8] => Array
+                (
+                    [user-id] => 40
+                    [allocated] => 0
+                    [left] => 8
+                    [Task] => 0
+                )
+
+            [9] => Array
+                (
+                    [user-id] => 42
+                    [allocated] => 3
+                    [left] => 5
+                    [Task] => 1
+                )
+
+            [10] => Array
+                (
+                    [user-id] => 44
+                    [allocated] => 0
+                    [left] => 8
+                    [Task] => 0
+                )
+
+        )
+
+)

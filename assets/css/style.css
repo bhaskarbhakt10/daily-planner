@@ -162,7 +162,7 @@ button[type="button"]:not(.action-btn):hover {
   position: sticky;
   left: 0;
   background: #fff;
-  z-index: 3; /* not 99999 — jQuery UI will handle during drag */
+  z-index: 999; /* not 99999 — jQuery UI will handle during drag */
   min-width: 180px;
   max-width: 180px;
 }
@@ -220,3 +220,16 @@ body {
     transition: all 0.2s ease-in-out;
 }
 
+.project-drag-handle {
+  cursor: move;
+  margin-right: 6px;
+  color: #888;
+  font-size: 18px;
+  display: inline-block;
+}
+
+.sortable-placeholder {
+  background-color: #f0f0f0;
+  border: 2px dashed #ccc;
+  height: 50px;
+}
