@@ -237,14 +237,16 @@ $(function () {
 
 
 function submitData() {
-  const planning = [];
-  const workload = [];
+  const projectGroups = document.querySelectorAll("tbody.project-group");
+
+  const rawPlanning = [];
+  const workloadMap = {};
 
   const selectedDateInput = document.getElementById("selected_date");
   let selectedDate = selectedDateInput ? selectedDateInput.value : null;
   console.log("Selected Date:", selectedDate);
 
-  // Convert MM/DD/YYYY → YYYY-MM-DD if needed
+  // Convert MM/DD/YYYY → YYYY-MM-DD
   const parts = selectedDate.split("/");
   if (parts.length === 3) {
     const [month, day, year] = parts;
@@ -255,70 +257,77 @@ function submitData() {
     return;
   }
 
-  // Loop over each project group
-  document.querySelectorAll(".project-group").forEach((group, groupIndex) => {
+  projectGroups.forEach((group) => {
     const rows = group.querySelectorAll("tr");
 
     const projectSelect = group.querySelector('select[name="project[]"]');
-    const projectId = projectSelect ? projectSelect.value : null;
-    if (!projectId) return;
+    const projectId = group.querySelector('select[name="project[]"]')?.value || null;
+
+
+    if (!projectId) {
+      console.warn("Project ID is null or empty in one of the groups");
+      return;
+    }
 
     const priorityCheckbox = group.querySelector('input[name="client_priority[]"]');
-    const clientPriority = priorityCheckbox && priorityCheckbox.checked ? 1 : 0;
+    const clientPriority = priorityCheckbox?.checked ? 1 : 0;
 
     const tasks = [];
 
     rows.forEach((row) => {
       const taskInput = row.querySelector('input[type="text"]');
       const hoursSelect = row.querySelector('select[name^="hours"]');
-      const assignedSelect = row.querySelector('select[name^="assigned_to"]');
-      const assignedTo = assignedSelect ? $(assignedSelect).val() : null;
+      const assignedSelects = row.querySelectorAll('select[name^="assigned_to"]');
 
-      if (
-        taskInput &&
-        taskInput.value.trim() !== "" &&
-        hoursSelect &&
-        assignedTo
-      ) {
-        tasks.push({
-          task_description: taskInput.value.trim(),
-          assigned_to: parseInt(assignedTo),
-          hours: parseFloat(hoursSelect.value),
-        });
-      }
+      assignedSelects.forEach((assignedSelect) => {
+        const assignedTo = parseInt($(assignedSelect).val(), 10);
+        const taskHours = parseFloat(hoursSelect?.value || "0");
+
+        if (
+          taskInput?.value.trim() &&
+          !isNaN(assignedTo) &&
+          !isNaN(taskHours)
+        ) {
+          tasks.push({
+            task_description: taskInput.value.trim(),
+            assigned_to: assignedTo,
+            hours: taskHours,
+          });
+
+          // Track workload
+          if (!workloadMap[assignedTo]) {
+            workloadMap[assignedTo] = { "user-id": assignedTo, allocated: 0, left: 8, Task: 0 };
+          }
+
+          workloadMap[assignedTo].allocated += taskHours;
+          workloadMap[assignedTo].left = 8 - workloadMap[assignedTo].allocated;
+          workloadMap[assignedTo].Task += 1;
+        }
+      });
     });
 
     if (tasks.length > 0) {
-      planning.push({
+      rawPlanning.push({
         project_id: projectId,
-        position: groupIndex + 1,
         client_priority: clientPriority,
-        tasks: tasks,
+        tasks,
       });
     }
   });
 
-  // Optional workload table logic
-  document.querySelectorAll(".workload-table tbody tr").forEach((row) => {
-    const userIdAttr = row.getAttribute("data-user-id");
-    const cells = row.querySelectorAll("td");
-    if (userIdAttr && cells.length >= 4) {
-      workload.push({
-        "user-id": parseInt(userIdAttr),
-        allocated: parseFloat(cells[1].innerText.trim()),
-        left: parseFloat(cells[2].innerText.trim()),
-        Task: parseInt(cells[3].innerText.trim()),
-      });
-    }
-  });
+  // Sort and add positions
+  const planning = rawPlanning.sort((a, b) => b.client_priority - a.client_priority)
+    .map((proj, idx) => ({ ...proj, position: idx + 1 }));
+
+  const workload = Object.values(workloadMap);
 
   const jsonData = {
     date: selectedDate,
-    planning: planning,
-    workload: workload,
+    planning,
+    workload,
   };
 
-  console.log("Final JSON data being sent:", JSON.stringify(jsonData, null, 2));
+  console.log("Final JSON being sent:", JSON.stringify(jsonData, null, 2));
 
   fetch("includes/submit_planning.php", {
     method: "POST",

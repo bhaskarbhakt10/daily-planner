@@ -55,21 +55,18 @@ if (!$date) {
     exit;
 }
 
-// 4. Extract priority from first project (optional)
-$firstPriority = isset($data['planning'][0]['client_priority']) ? (int)$data['planning'][0]['client_priority'] : 0;
-
-// 5. Insert or update row
+// 4. Insert or update row (without client_priority)
 $stmtCheck = $conn->prepare("SELECT id FROM daily_planning_data WHERE plan_date = ?");
 $stmtCheck->bind_param("s", $date);
 $stmtCheck->execute();
 $result = $stmtCheck->get_result();
 
 if ($result && $result->num_rows > 0) {
-    $stmt = $conn->prepare("UPDATE daily_planning_data SET data = ?, client_priority = ? WHERE plan_date = ?");
-    $stmt->bind_param("sis", $finalJson, $firstPriority, $date);
+    $stmt = $conn->prepare("UPDATE daily_planning_data SET data = ? WHERE plan_date = ?");
+    $stmt->bind_param("ss", $finalJson, $date);
 } else {
-    $stmt = $conn->prepare("INSERT INTO daily_planning_data (data, plan_date, client_priority) VALUES (?, ?, ?)");
-    $stmt->bind_param("ssi", $finalJson, $date, $firstPriority);
+    $stmt = $conn->prepare("INSERT INTO daily_planning_data (data, plan_date) VALUES (?, ?)");
+    $stmt->bind_param("ss", $finalJson, $date);
 }
 
 if ($stmt->execute()) {

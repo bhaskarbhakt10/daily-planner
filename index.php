@@ -83,7 +83,7 @@ if ($editMode) {
 </style> -->
 
 
-    <form method="GET" style="margin: 20px;">
+    <form method="GET" style="margin: 10px;">
         <label for="selected_date">Select Date:</label>
         <input 
             type="text" 
@@ -91,6 +91,7 @@ if ($editMode) {
             name="selected_date" 
             value="<?= htmlspecialchars($selectedDate) ?>" 
             readonly
+            style="width: 150px;"
         >
 
     </form>
@@ -100,7 +101,8 @@ if ($editMode) {
     $(function () {
         const selectedDate = $('#hidden_date').val();
         $("#selected_date").datepicker({
-            dateFormat: "yy-mm-dd"
+            dateFormat: "yy-mm-dd",
+             minDate: 0
         }).datepicker("setDate", selectedDate);
     });
 </script>
