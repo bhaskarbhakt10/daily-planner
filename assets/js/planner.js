@@ -229,10 +229,10 @@ $(function () {
     minDate: 0
   });
 
-  const initialDate = $("#selected_date").val();
-  if (initialDate) {
-    $("#selected_date").datepicker("setDate", initialDate);
-  }
+  // const initialDate = $("#selected_date").val();
+  // if (initialDate) {
+  //   $("#selected_date").datepicker("setDate", initialDate);
+  // }
 });
 
 

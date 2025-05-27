@@ -5,12 +5,6 @@ $users = [];
 $hours = ["0.5", "1", "1.5", "2", "2.5", "3", "3.5", "4", "5", "6", "7", "8"];
 
 // $selectedDate = $_GET['edit_date'] ?? $_GET['selected_date'] ?? date('Y-m-d');
-$editDate = $_GET['edit_date'] ?? null;
-$selectedDate = $editDate ?? ($_GET['selected_date'] ?? date('Y-m-d'));
-$editMode = isset($editDate);
-
-
-
 
 $result = $conn->query("SELECT Project_Id, Project_Name FROM projects");
 while ($row = $result->fetch_assoc()) {
@@ -27,6 +21,10 @@ while ($row = $result->fetch_assoc()) {
         'name' => $row['firstname']
     ];
 }
+
+$editDate = $_GET['edit_date'] ?? null;
+$selectedDate = $editDate ?? ($_GET['selected_date'] ?? date('Y-m-d'));
+$editMode = isset($editDate);
 
 // $editMode = false;
 // $editDate = $_GET['edit_date'] ?? null;

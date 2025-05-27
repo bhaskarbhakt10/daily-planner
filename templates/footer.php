@@ -1,6 +1,7 @@
 <script>
   const projects = <?= json_encode($projects) ?>;
   const users = <?= json_encode($users) ?>;
+  const hours = <?= json_encode($hours) ?>;
  
 </script>
 
