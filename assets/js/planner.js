@@ -229,10 +229,10 @@ $(function () {
     minDate: 0
   });
 
-  // const initialDate = $("#selected_date").val();
-  // if (initialDate) {
-  //   $("#selected_date").datepicker("setDate", initialDate);
-  // }
+  const initialDate = $("#selected_date").val();
+  if (initialDate) {
+    $("#selected_date").datepicker("setDate", initialDate);
+  }
 });
 
 
@@ -448,9 +448,14 @@ $(document).ready(function () {
     fetch("includes/fetch_workload.php?day=" + todayDay)
         .then((res) => res.text())
         .then((html) => {
-            document.querySelector(".right-panel2").innerHTML = html;
-        })
-        .catch((err) => console.error("Error loading workload:", err));
+    const rightPanel = document.querySelector(".right-panel2");
+    if (rightPanel) {
+        rightPanel.innerHTML = html;
+    } else {
+        console.warn("Element .right-panel2 not found in DOM.");
+    }
+})
+
 });
 
 // Event binding for clicking on weekday headers

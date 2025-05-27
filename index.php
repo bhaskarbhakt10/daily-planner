@@ -113,11 +113,11 @@ if ($editMode) {
     type="text" 
     id="selected_date" 
     name="selected_date" 
-    value="<?= htmlspecialchars($selectedDate) ?>" 
+    value=" 
 >
 
 </form>
-<input type="hidden" id="hidden_date" value="<?= htmlspecialchars($selectedDate) ?>"> -->
+<input type="hidden" id="hidden_date" value=""> -->
 
 
 
