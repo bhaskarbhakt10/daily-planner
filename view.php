@@ -61,6 +61,18 @@ while ($row = $result->fetch_assoc()) {
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <script src="https://code.jquery.com/ui/1.14.1/jquery-ui.min.js"></script>
 
+<script>
+$(document).ready(function() {
+    // Make all input fields readonly
+    $('input[type="text"]').prop('readonly', true);
+
+    // Optionally, disable any dropdowns, buttons, etc.
+    $('select, textarea').prop('disabled', true);
+    $('button, .edit-button, a.edit-button').remove(); // Remove or disable edit links/buttons
+});
+</script>
+
+
 <style>
 .project-drag-handle {
     cursor: move;
