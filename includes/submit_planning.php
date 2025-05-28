@@ -49,7 +49,7 @@ if (!$parsed || $parsed->format('Y-m-d') !== $date) {
 }
 
 if (!$date) {
-    file_put_contents('debug.log', "Date is null or missing: " . print_r($data, true));
+    // file_put_contents('debug.log', "Date is null or missing: " . print_r($data, true));
     http_response_code(400);
     echo json_encode(['status' => 'error', 'message' => 'Date is missing.']);
     exit;

@@ -63,14 +63,15 @@ while ($row = $result->fetch_assoc()) {
 
 <script>
 $(document).ready(function() {
-    // Make all input fields readonly
+    // Make all text inputs readonly
     $('input[type="text"]').prop('readonly', true);
 
-    // Optionally, disable any dropdowns, buttons, etc.
+    // Optionally disable other controls
     $('select, textarea').prop('disabled', true);
-    $('button, .edit-button, a.edit-button').remove(); // Remove or disable edit links/buttons
+    $('button').prop('disabled', true); // Only disable <button>, not <a>
 });
 </script>
+
 
 
 <style>
