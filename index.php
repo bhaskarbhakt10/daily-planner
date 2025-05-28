@@ -1,8 +1,12 @@
-<?php require_once 'templates/header.php'; ?>
-<?php
+<?php 
+
+require_once 'templates/header.php'; 
+require_once 'templates/header.php';
+require_once 'config/db.php';
+
 $projects = [];
 $users = [];
-$hours = ["0.5", "1", "1.5", "2", "2.5", "3", "3.5", "4", "5", "6", "7", "8"];
+$hours = ["0","0.5", "1", "1.5", "2", "2.5", "3", "3.5", "4", "5", "6", "7", "8"];
 
 // $selectedDate = $_GET['edit_date'] ?? $_GET['selected_date'] ?? date('Y-m-d');
 
@@ -26,9 +30,6 @@ $editDate = $_GET['edit_date'] ?? null;
 $selectedDate = $editDate ?? ($_GET['selected_date'] ?? date('Y-m-d'));
 $editMode = isset($editDate);
 
-// $editMode = false;
-// $editDate = $_GET['edit_date'] ?? null;
-
 if ($editMode) {
     $editDate = $selectedDate;
 
@@ -44,6 +45,8 @@ if ($editMode) {
         $existingData = json_decode($row['data'], true);
     }
 }
+
+
 
 
 ?>
@@ -66,22 +69,21 @@ if ($editMode) {
 
 </script>
 
-<!-- <style>
-.project-drag-handle {
-  cursor: move;
-  margin-right: 6px;
-  color: #888;
-  font-size: 18px;
-  display: inline-block;
-}
+<!-- <form method="GET" style="margin: 20px;">
+    <label for="selected_date">Select Date:</label>
+    <input 
+    type="text" 
+    id="selected_date" 
+    name="selected_date" 
+    value=" 
+>
 
-.sortable-placeholder {
-  background-color: #f0f0f0;
-  border: 2px dashed #ccc;
-  height: 50px;
-}
-</style> -->
+</form>
+<input type="hidden" id="hidden_date" value=""> -->
 
+
+<section class="daily-planner-section">
+    <h2 style="margin-top: 40px; border-bottom: 2px solid #ddd; padding-bottom: 10px;">Daily Planner</h2>
 
     <form method="GET" style="margin: 10px;">
         <label for="selected_date">Select Date:</label>
@@ -98,41 +100,34 @@ if ($editMode) {
     <input type="hidden" id="hidden_date" value="<?= htmlspecialchars($selectedDate) ?>">
 
     <script>
-    $(function () {
-        const selectedDate = $('#hidden_date').val();
-        $("#selected_date").datepicker({
-            dateFormat: "yy-mm-dd",
-             minDate: 0
-        }).datepicker("setDate", selectedDate);
-    });
-</script>
+        $(function () {
+            const selectedDate = $('#hidden_date').val();
+            $("#selected_date").datepicker({
+                dateFormat: "yy-mm-dd",
+                minDate: 0
+            }).datepicker("setDate", selectedDate);
+        });
+    </script>
 
+        <div class="layout-wrapper">
+            <div class="left-panel">
+                <?php include 'templates/planner_form.php'; ?>
+            </div>
+            
+            <div class="right-panel">
+                <?php include 'templates/workload_table.php'; ?>
+            </div>
+        </div>
+</section>
 
-
-<!-- <form method="GET" style="margin: 20px;">
-    <label for="selected_date">Select Date:</label>
-    <input 
-    type="text" 
-    id="selected_date" 
-    name="selected_date" 
-    value=" 
->
-
-</form>
-<input type="hidden" id="hidden_date" value=""> -->
-
-
-
-
-<div class="layout-wrapper">
-    <div class="left-panel">
-        <?php include 'templates/planner_form.php'; ?>
+<section class="weekly-view-section">
+    <h2 style="margin-top: 40px; border-bottom: 2px solid #ddd; padding-bottom: 10px;">Weekly View</h2>
+    <div class="weekly-view-content">
+        <?php include 'weekly_view_section.php'; ?>
     </div>
-    
-    <div class="right-panel">
-        <?php include 'templates/workload_table.php'; ?>
-    </div>
-</div>
+</section>
+
+
 
 <?php require_once 'templates/footer.php'; ?>
 

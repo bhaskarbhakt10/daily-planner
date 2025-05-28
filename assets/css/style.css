@@ -233,3 +233,54 @@ body {
   border: 2px dashed #ccc;
   height: 50px;
 }
+
+tbody tr:first-child td button.remove.action-btn.col-dev {
+    display: none;
+}
+
+
+.daily-planner-section {
+    background-color: #f9f9f9;
+    padding: 30px;
+    margin: 5px 0;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+}
+
+.weekly-view-section {
+    background-color: #f9f9f9;
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+}
+
+.weekly-view-section h2 {
+    font-size: 22px;
+    color: #333;
+    font-weight: 600;
+}
+
+.weekly-view-content {
+    overflow-x: auto;
+}
+
+.project-drag-handle {
+    cursor: move;
+    display: inline-block;
+    margin-right: 5px;
+    color: #999;
+}
+.edit-button {
+    font-size: 14px;
+    margin-left: 6px;
+    color: #fff;
+    text-decoration: none;
+
+}
+
+.wrap-text {
+    white-space: normal;       /* allows wrapping */
+    word-wrap: break-word;     /* wraps long words */
+    max-width: 200px;          /* optional: limits cell width */
+}

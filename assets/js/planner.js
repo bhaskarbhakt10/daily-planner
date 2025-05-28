@@ -30,7 +30,7 @@ function addMainRow() {
                   .map((u) => `<option value="${u.id}">${u.name}</option>`)
                   .join("")}
             </select>
-            <button type="button" class="action-btn remove" style="margin-top: 4px;" onclick="removeSubRow(this)">Remove</button>
+            <button type="button" class="action-btn remove col-dev" style="margin-top: 4px;" onclick="removeSubRow(this)">Remove</button>
         </td>
         <td>
             <button type="button" class="action-btn add" onclick="addSubRow(this)">+ Add Dev/Designer</button><br>
@@ -77,7 +77,7 @@ function addSubRow(button) {
             <select name="assigned_to[][]" class="searchable-dropdown">
                 ${users.map(u => `<option value="${u.id}">${u.name}</option>`).join("")}
             </select>
-            <button type="button" class="action-btn remove" onclick="removeSubRow(this)">Remove</button>
+            <button type="button" class="action-btn remove col-dev" onclick="removeSubRow(this)">Remove</button>
         </td>
 
         <td></td> <!-- Action column still renders in main row -->

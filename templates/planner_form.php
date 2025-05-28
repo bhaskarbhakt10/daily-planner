@@ -57,7 +57,7 @@ $planningData = $existingData['planning'] ?? [];
                                         </option>
                                     <?php endforeach; ?>
                                 </select>
-                                <button type="button" class="action-btn remove" onclick="removeSubRow(this)">Remove</button>
+                                <!-- <button type="button" class="action-btn remove" onclick="removeSubRow(this)">Remove</button> -->
                             </td>
 
                             <td>
@@ -100,7 +100,7 @@ $planningData = $existingData['planning'] ?? [];
                                 <option value="<?= $user['id'] ?>"><?= htmlspecialchars($user['name']) ?></option>
                             <?php endforeach; ?>
                         </select>
-                        <button type="button" class="action-btn remove" onclick="removeSubRow(this)">Remove</button>
+                        <button type="button" class="action-btn remove col-dev" onclick="removeSubRow(this)">Remove</button>
                     </td>
 
                     <td>
